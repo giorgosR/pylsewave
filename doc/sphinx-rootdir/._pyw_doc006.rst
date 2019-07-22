@@ -1,0 +1,583 @@
+.. !split
+
+.. _ch:appBlabel:
+
+Appendix B: Wrapping C++ classes in pylseWave via Cython
+========================================================
+
+There are several methods to wrap C/C++ classes/methods in Python. Some of these regard the CPython API, SWIG, PYREX, SIP, BOOST.PYTHON, ctypes and Cython (`Software Carpentry <http://intermediate-and-advanced-software-carpentry.readthedocs.io/en/latest/c++-wrapping.html>`__, `python wiki <https://wiki.python.org/moin/IntegratingPythonWithOtherLanguages>`__). The last two options have been used in pylseWave.
+
+ctypes
+------
+
+Firstly, let's illustrate a simple example with ctypes. We write a C function to calculate the reference radius calculated as
+
+.. math::
+        \begin{align*}
+        R_0(x) = R_p e^{(\log{(\frac{R_d}{R_p})}(\frac{x}{L}))}
+        \end{align*}
+
+
+.. admonition:: C function: Compute reference radius
+
+   
+   .. code-block:: c
+   
+       void compute_radius(double radius_p, double radius_d, double length, double * x, double * r_out, int m){
+       	for (int i = 0; i < m; i++){
+       		r_out[i] = radius_p * exp(log(radius_d/radius_p)*(x[i]/length));
+       	}
+       }
+
+
+
+
+Then, we create a python module that will call this function from a pre-compiled dll.
+
+
+.. admonition:: Py function: Wrap reference radius computation C function
+
+   
+   .. code-block:: python
+   
+       # cpylseWave.py
+       
+       # in our preamble import ctypes classes, methods, etc.
+       from ctypes import (cdll, CFUNCTYPE, c_double,
+                           c_int, POINTER, c_float, pointer,
+                           c_size_t)
+       from numpy.ctypeslib import ndpointer
+       import numpy as np
+       # we have to specify the relative directory of the dll
+       pwpydll = cdll.LoadLibrary(r'./CLibs/build/Debug/cpulsewavepy.dll')
+       
+       # the following are types for 1D, 2D and 3D double arrays
+       doube_p1d = ndpointer(dtype=np.double, ndim=1, flags="CONTIGUOUS")
+       doube_p2d = ndpointer(dtype=np.uintp, ndim=1, flags="CONTIGUOUS")
+       doube_p3d = ndpointer(dtype=np.uintp, ndim=3, flags="CONTIGUOUS")
+       
+       # Then, we need to create a python variable for the imported dll function
+       compute_radius_f = pwpydll.compute_radius
+       # we define the return type (if any)
+       compute_radius_f.restype = None
+       # we define the input argument types
+       compute_radius_f.argtypes = [c_double, c_double, c_double,
+                                    ndpointer(dtype=np.double, ndim=1, flags="CONTIGUOUS"),
+                                    ndpointer(dtype=np.double, ndim=1, flags="CONTIGUOUS"),
+                                    c_int]
+                                    
+       
+       # finally, we declare a python function which wraps the C function
+       def compute_radius(r_p, r_d, l, x_in, x_out):
+           if hasattr(x_in, "__len__"):
+               return compute_radius_f(r_p, r_d, l, x_in, x_out, len(x_in))
+
+
+
+
+cython
+------
+
+wrapping a C++ function
+~~~~~~~~~~~~~~~~~~~~~~~
+
+In this section, the wrapping method of a C++ function is documented. In particular, the "tri-diagonal algorithm" or "thomas algorithm'' is wrapped in pylseWave via Cython compiler. Given a linear system of equations, expressed as :math:`A x = b`, with :math:`A` be a tri-diagonal matrix, the following presented function returns the solution vector :math:`x`.
+
+
+.. admonition:: Method declaration in h file: Thomas algorithm
+
+   
+   .. code-block:: c++
+   
+       // cypwfuns.h
+       #ifndef __CYPWFUNS_H__
+       #define __CYPWFUNS_H__
+       
+       #include <vector>
+       #include <iostream>
+       #include <string>
+       
+       namespace funs {
+       	int tdma(double*, double*, double*,
+       		double*, double*, size_t);
+       }
+       
+       }
+       
+       #endif
+
+
+
+
+
+.. admonition:: Method declaration in cpp file: Thomas algorithm
+
+   
+   .. code-block:: c++
+   
+       // cypwfuns.cpp
+       
+       int funs::tdma(double* a, double* b, double* c,
+       	double* d, double* out, size_t N_n) {
+       
+       	std::vector<double> c_star(N_n, 0.0);
+       	std::vector<double> d_star(N_n, 0.0);
+       
+       	c_star[0] = c[0] / b[0];
+       	d_star[0] = d[0] / b[0];
+       
+       	for (size_t i = 1; i < N_n - 1; i++)
+       	{
+       		double m = 1.0 / (b[i] - a[i - 1] * c_star[i - 1]);
+       		c_star[i] = c[i] * m;
+       		d_star[i] = (d[i] - a[i - 1] * d_star[i - 1])*m;
+       	}
+       
+       	d_star[N_n - 1] = (d[N_n - 1] - a[N_n - 2] * d_star[N_n - 2]) / (b[N_n - 1] - a[N_n - 2] * c_star[N_n - 2]);
+       
+       	out[N_n - 1] = d_star[N_n - 1];
+       	for (int i = N_n - 1; i-- > 0;)
+       	{
+       		out[i] = d_star[i] - c_star[i] * out[i + 1];
+       	}
+       
+       	return 0;
+       }
+
+
+
+
+
+.. admonition:: Method declaration in pyx file: Thomas algorithm
+
+   
+   .. code-block:: c++
+   
+       # cynum.pyx
+       
+       cdef extern from "include/cypwfuns.h" namespace "funs":
+           int tdma(double *, double *, double *,
+                    double *, double *, size_t)
+           double std_dev(double *, size_t)
+       
+       cpdef int pytdma(np.ndarray[np.float64_t, ndim=1] a,
+                  np.ndarray[np.float64_t, ndim=1] b,
+                  np.ndarray[np.float64_t, ndim=1] c,
+                  np.ndarray[np.float64_t, ndim=1] d,
+                  np.ndarray[np.float64_t, ndim=1] out):
+       
+           cdef Py_ssize_t siz = d.shape[0]
+           return tdma(<double*> a.data, <double*> b.data, <double*> c.data,
+                       <double*> d.data, <double*> out.data, siz)
+
+
+
+
+wrapping a class
+~~~~~~~~~~~~~~~~
+
+In this part, we demonstrate how a C++ class can be wrapped in python with the modern Cython compiler. Firstly, we have to create a h file with the class definition as
+
+
+.. admonition:: Class h file: A class for an arterial vessel
+
+   
+   .. code-block:: c++
+   
+       // cypwmesh.h
+       #ifndef __CYPWMESH_H__
+       #define __CYPWMESH_H__
+       
+       #include <vector>
+       #include <iostream>
+       #include <string>
+       #include <map>
+       
+       class Vessel
+       {
+       public:
+       	Vessel(std::string const & name_, double L_, double R_proximal, double R_distal,
+       		double Wall_thickness, std::map<std::string, double> Windkessels, int id);
+       	virtual ~Vessel();
+       	//properties
+       	std::string getName();
+       	double getL();
+       	double getRadius_prox();
+       	double getRadius_dist();
+       	double getWall_th();
+       	double getdx();
+       	int getId();
+       	std::vector<double> get_x();
+       	std::map<std::string, double> getRLC();
+       	std::vector<double> get_k_vector();
+       	std::vector<double> getR0();
+       	std::vector<double> get_f_R0();
+       	std::vector<double> get_df_dR0();
+       	std::vector<double> get_df_dx();
+       	std::vector<double> get_f_R0_ph();
+       	std::vector<double> get_df_dR0_ph();
+       	std::vector<double> get_df_dx_ph();
+       	std::vector<double> get_f_R0_mh();
+       	std::vector<double> get_df_dR0_mh();
+       	std::vector<double> get_df_dx_mh();
+       	//members
+       	void setdx(double);
+       	void setRLC(std::map<std::string, double>);
+       	virtual void set_k_vector(std::vector<double>);
+       	std::vector<double> interpolate_R0(double value);
+       protected:
+       	std::string name;
+       	double L;
+       	double R_prox;
+       	double R_dist;
+       	double W_th;
+       	double dx;
+       	std::vector<double> R0;
+       	int Id;
+       	std::vector<double> x;
+       	std::map<std::string, double> RLC;
+       	std::vector<double> f_r0;
+       	std::vector<double> df_dr0;
+       	std::vector<double> df_dx;
+       	std::vector<double> f_r0_ph;
+       	std::vector<double> df_dr0_ph;
+       	std::vector<double> df_dx_ph;
+       	std::vector<double> f_r0_mh;
+       	std::vector<double> df_dr0_mh;
+       	std::vector<double> df_dx_mh;
+       	std::vector<double> k;
+       	void calculate_R0();
+       	static std::vector<double> f(std::vector<double>, std::vector<double>);
+       	static std::vector<double> dfdr(std::vector<double>, std::vector<double>);
+       private:
+       
+       	
+       };
+       
+       #endif
+
+
+
+
+Secondly, we creare a cpp file with the code implementation of the class as
+
+
+.. admonition:: Class C++ file: A class for an arterial vessel
+
+   
+   .. code-block:: c++
+   
+       // cypwmesh.cpp
+       #include <math.h>
+       #include <iostream>
+       #include <string>
+       #include <map>
+       #include "include/cypwfuns.h"
+       #include "include/cypwmesh.h"
+       
+       // ------------------ VESSEL ------------------------- //
+       Vessel::Vessel(std::string const & name_, double L_, double R_proximal, double R_distal,
+       		double Wall_thickness, std::map<std::string,
+       	double> Windkessels = std::map<std::string, double>(), int id=0)
+       {
+       	name = name_;
+       	L = L_;
+       	R_prox = R_proximal;
+       	R_dist = R_distal;
+       	W_th = Wall_thickness;
+       	Id = id;
+       	if (Windkessels.empty() == false)
+       	{
+       		RLC = Windkessels;
+       	}
+       
+       }
+       
+       Vessel::~Vessel()
+       {
+       }
+       
+       int Vessel::getId(){
+       	return Id;
+       }
+       
+       std::string Vessel::getName(){
+       	return name;
+       }
+       
+       double Vessel::getL(){
+       	return L;
+       }
+       
+       double Vessel::getdx() {
+       	return dx;
+       }
+       
+       double Vessel::getRadius_prox(){
+       	return R_prox;
+       }
+       
+       double Vessel::getRadius_dist(){
+       	return R_dist;
+       }
+       
+       double Vessel::getWall_th()
+       {
+       	return W_th;
+       }
+       
+       std::map<std::string, double> Vessel::getRLC() {
+       	return RLC;
+       }
+       
+       std::vector<double> Vessel::get_k_vector() {
+       	return k;
+       }
+       
+       std::vector<double> Vessel::get_x() {
+       	return x;
+       }
+       
+       std::vector<double> Vessel::get_f_R0() {
+       	return f_r0;
+       }
+       
+       std::vector<double> Vessel::get_df_dR0() {
+       	return df_dr0;
+       }
+       
+       std::vector<double> Vessel::get_df_dx() {
+       	return df_dx;
+       }
+       
+       std::vector<double> Vessel::get_f_R0_ph() {
+       	return f_r0_ph;
+       }
+       
+       std::vector<double> Vessel::get_df_dR0_ph() {
+       	return df_dr0_ph;
+       }
+       
+       std::vector<double> Vessel::get_df_dx_ph() {
+       	return df_dx_ph;
+       }
+       
+       std::vector<double> Vessel::get_f_R0_mh() {
+       	return f_r0_mh;
+       }
+       
+       std::vector<double> Vessel::get_df_dR0_mh() {
+       	return df_dr0_mh;
+       }
+       
+       std::vector<double> Vessel::get_df_dx_mh() {
+       	return df_dx_mh;
+       }
+       
+       std::vector<double> Vessel::getR0() {
+       	return R0;
+       }
+       
+       //
+       void Vessel::setdx(double dx_input)
+       {
+       	//dx = dx_input;
+       	if ((int)(round(L / dx_input) + 1) == 1)
+       	{
+       		x.push_back(0.);
+       		x.push_back(L);
+       	}
+       	else
+       	{
+       		x = funs::linspace(0., L, (int)round(L / dx_input) + 1);
+       	}
+       	dx = x[1] - x[0];
+       	// calculate R0(x)
+       	if (R0.empty() != true)
+       	{
+       		R0.clear();
+       	}
+       	this->calculate_R0();
+       	if (k.empty() != true)
+       	{
+       		f_r0 = f(R0, k);
+       		df_dr0 = dfdr(R0, k);
+       		df_dx = funs::gradient(R0, dx);
+       		f_r0_ph = f(interpolate_R0(0.5), k);
+       		df_dr0_ph = dfdr(interpolate_R0(0.5), k);
+       		df_dx_ph = funs::gradient(interpolate_R0(0.5), dx);
+       		f_r0_mh = f(interpolate_R0(-0.5), k);
+       		df_dr0_mh = dfdr(interpolate_R0(-0.5), k);
+       		df_dx_mh = funs::gradient(interpolate_R0(-0.5), dx);
+       	}
+       }
+       
+       void Vessel::setRLC(std::map<std::string, double> dinput) {
+       	RLC = dinput;
+       }
+       
+       void Vessel::set_k_vector(std::vector<double> k_input) {
+       	k = k_input;
+       }
+       
+       void Vessel::calculate_R0()
+       {
+       	//int size = static_cast<int>(x.size());
+       	for (std::vector<int>::size_type i = 0; i != x.size(); i++)
+       	{
+       		R0.push_back(R_prox*exp(log(R_dist / R_prox)*(x[i] / L)));
+       	}
+       }
+       
+       std::vector<double> Vessel::interpolate_R0(double value) {
+       	std::vector<double> vout(x.size(), 0.0);
+       	for (std::vector<int>::size_type i = 0; i != x.size(); i++)
+       	{
+       		vout[i] = R_prox*exp(log(R_dist / R_prox)*((x[i] + dx*value )/ L));
+       	}
+       	return vout;
+       }
+       
+       std::vector<double> Vessel::f(std::vector<double> R0_input, std::vector<double> k_input) {
+       	double k1 = k_input[0];
+       	double k2 = k_input[1];
+       	double k3 = k_input[2];
+       	std::vector<double> vout;
+       	for (std::vector<int>::size_type i = 0; i != R0_input.size(); i++)
+       	{
+       		vout.push_back((4 / 3.) * (k2 * exp(k3 * R0_input[i]) + k1));
+       	}
+       
+       	return vout;
+       }
+       
+       std::vector<double> Vessel::dfdr(std::vector<double> R0_input, std::vector<double> k_input) {
+       	double k1 = k_input[0];
+       	double k2 = k_input[1];
+       	double k3 = k_input[2];
+       	std::vector<double> vout;
+       	for (std::vector<int>::size_type i = 0; i != R0_input.size(); i++)
+       	{
+       		vout.push_back((4 / 3.) * k2 * k3 * exp(k3 * R0_input[i]));
+       	}
+       
+       	return vout;
+       }
+
+
+
+
+Lastly, we create a ``.pyx`` file with class wrapper for the C++ code. The python class is defined as 
+
+
+.. admonition:: Cy class: Wrapping class for C++ respective class
+
+   
+   .. code-block:: python
+   
+       # cynum.pyx
+       
+       cdef class cyVessel(object):
+           cdef Vessel *thisptr
+       
+           def __cinit__(self, string name, DTYPE_t L, DTYPE_t R_prox, DTYPE_t R_dist,
+                         DTYPE_t Wall_th, dict Windk = dict(), int Id = 0, rc=0):
+               if type(self) is cyVessel:
+                   self.thisptr = new Vessel(name, L, R_prox, R_dist, Wall_th, Windk, Id)
+       
+           def __dealloc__(self):
+               if type(self) is cyVessel:
+                   del self.thisptr
+       
+           @property
+           def name(self):
+               return self.thisptr.getName()
+       
+           @property
+           def L(self):
+               return self.thisptr.getL()
+       
+           @property
+           def r_prox(self):
+               return self.thisptr.getRadius_prox()
+       
+           @property
+           def r_dist(self):
+               return self.thisptr.getRadius_dist()
+       
+           @property
+           def id(self):
+               return self.thisptr.getId()
+       
+           @property
+           def w_th(self):
+               return self.thisptr.getWall_th()
+       
+           property RLC:
+               def __get__(self):
+                   return self.thisptr.getRLC()
+               def __set__(self, dict dinput):
+                   self.thisptr.setRLC(dinput)
+       
+           property dx:
+               def __get__(self):
+                   return self.thisptr.getdx()
+               def __set__(self, DTYPE_t dinput):
+                   self.thisptr.setdx(dinput)
+       
+           @property
+           def x(self):
+               return np.asarray(self.thisptr.get_x())
+       
+           @property
+           def r0(self):
+               return np.asarray(self.thisptr.getR0())
+       
+           @property
+           def f_r0(self):
+               return np.asarray(self.thisptr.get_f_R0())
+       
+           @property
+           def df_dr0(self):
+               return np.asarray(self.thisptr.get_df_dR0())
+       
+           @property
+           def df_dx(self):
+               return np.asarray(self.thisptr.get_df_dx())
+       
+           @property
+           def f_r0_ph(self):
+               return np.asarray(self.thisptr.get_f_R0_ph())
+       
+           @property
+           def df_dr0_ph(self):
+               return np.asarray(self.thisptr.get_df_dR0_ph())
+       
+           @property
+           def df_dx_ph(self):
+               return np.asarray(self.thisptr.get_df_dx_ph())
+       
+           @property
+           def f_r0_mh(self):
+               return np.asarray(self.thisptr.get_f_R0_mh())
+       
+           @property
+           def df_dr0_mh(self):
+               return np.asarray(self.thisptr.get_df_dR0_mh())
+       
+           @property
+           def df_dx_mh(self):
+               return np.asarray(self.thisptr.get_df_dx_mh())
+       
+           @property
+           def k(self):
+               return np.asarray(self.thisptr.get_k_vector())
+       
+           def set_k_vector(self, input_v):
+               self.thisptr.set_k_vector(input_v)
+       
+           def interpolate_R0(self, value):
+               return np.asarray(self.thisptr.interpolate_R0(value))
+
+
+

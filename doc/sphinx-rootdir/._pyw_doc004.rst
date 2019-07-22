@@ -1,0 +1,123 @@
+.. !split
+
+Bibliography
+============
+
+.. [Ref01]
+   **P. Y. Lagree**. An Inverse Technique to Deduce the Elasticity of a Large Artery,
+   *European Physical Journal Applied Physics*,
+   9(2),
+   pp. 153-163,
+   2000,
+   `https://doi.org/10.1051/epjap:2000213 <https://doi.org/10.1051/epjap:2000213>`_.
+
+.. [Ref02]
+   **W. Nichols, M. O'Rourke and C. Vlachopoulos**. *McDonald's Blood Flow in Arteries, Sixth Edition: Theoretical, Experimental and Clinical Principles*,
+   6 edition,
+   **,
+   CRC Press,
+   2011.
+
+.. [Ref03]
+   **L. Formaggia, D. Lamponi and A. Quarteroni**. One-Dimensional Models for Blood Flow in Arteries,
+   *Journal of Engineering Mathematics*,
+   47(3),
+   pp. 251-276,
+   `doi: 10.1023/B:ENGI.0000007980.01347.29 <http://dx.doi.org/10.1023/B:ENGI.0000007980.01347.29>`__,
+   2003,
+   `https://doi.org/10.1023/B:ENGI.0000007980.01347.29 <https://doi.org/10.1023/B:ENGI.0000007980.01347.29>`_.
+
+.. [Ref04]
+   **A. S. Olufsen**. Modeling the Arterial System With Reference to an Anesthesia Simulator,
+   Ph.D. Thesis,
+   Roskilde Universitet,
+   1998.
+
+.. [Ref05]
+   **N. Stergiopulos, D. Young and T. Rogge**. Computer Simulation of Arterial Flow With Applications to Arterial and Aortic Stenoses,
+   *Journal of Biomechanics*,
+   25(12),
+   pp. 1477-1488,
+   `doi: https://doi.org/10.1016/0021-9290(92)90060-E <http://dx.doi.org/https://doi.org/10.1016/0021-9290(92)90060-E>`__,
+   1992,
+   `http://www.sciencedirect.com/science/article/pii/002192909290060E <http://www.sciencedirect.com/science/article/pii/002192909290060E>`_.
+
+.. [Ref06]
+   **J. Alastruey, K. Parker and S. Sherwin**. Arterial Pulse Wave Haemodynamics,
+   in *BHR Group - 11th International Conferences on Pressure Surges*,
+   pp. pp. 401-442,
+   2012.
+
+.. [Ref07]
+   **S. Sherwin, V. Franke, J. Peiro and K. Parker**. One-Dimensional Modelling of a Vascular Network in Space-Time Variables,
+   *Journal of Engineering Mathematics*,
+   47(3),
+   pp. 217-250,
+   `doi: 10.1023/B:ENGI.0000007979.32871.e2 <http://dx.doi.org/10.1023/B:ENGI.0000007979.32871.e2>`__,
+   2003,
+   `https://doi.org/10.1023/B:ENGI.0000007979.32871.e2 <https://doi.org/10.1023/B:ENGI.0000007979.32871.e2>`_.
+
+.. [Ref08]
+   **P. Nithiarasu**. Biofluid Dynamics,
+   in *Swansea University notes*,
+   pp. pp. 401-442,
+   2012.
+
+.. [Ref09]
+   **E. Boileau, P. Nithiarasu, P. J. Blanco, L. O. Muller, F. E. Fossan, L. R. Hellevik, W. P. Donders, W. Huberts, M. Willemet and J. Alastruey**. A Benchmark Study of Numerical Schemes for One-Dimensional Arterial Blood Flow Modelling,
+   *International Journal for Numerical Methods in Biomedical Engineering*,
+   31(10),
+   pp. n/a-n/a,
+   `doi: 10.1002/cnm.2732 <http://dx.doi.org/10.1002/cnm.2732>`__,
+   2015,
+   `http://dx.doi.org/10.1002/cnm.2732 <http://dx.doi.org/10.1002/cnm.2732>`_.
+
+.. [Ref10]
+   **X. Wang, J.-M. Fullana and P.-Y. Lagree**. Verification and Comparison of Four Numerical Schemes for a 1D Viscoelastic Blood Flow Model,
+   *Computer Methods in Biomechanics and Biomedical Engineering*,
+   18(15),
+   pp. 1704-1725,
+   `doi: 10.1080/10255842.2014.948428 <http://dx.doi.org/10.1080/10255842.2014.948428>`__,
+   2015,
+   PMID: 25145651.
+
+.. [Ref11]
+   **O. San and A. E. Staples**. An Improved Model for Reduced-Order Physiological Fluid Flows,
+   *Journal of Mechanics in Medicine and Biology*,
+   12(03),
+   pp. 1250052,
+   `doi: 10.1142/S0219519411004666 <http://dx.doi.org/10.1142/S0219519411004666>`__,
+   2012.
+
+.. [Ref12]
+   **M. S. Olufsen, C. S. Peskin, W. Y. Kim, E. M. Pedersen, A. Nadim and J. Larsen**. Numerical Simulation and Experimental Validation of Blood Flow in Arteries With Structured-Tree Outflow Conditions,
+   *Annals of Biomedical Engineering*,
+   28(11),
+   pp. 1281-1299,
+   `doi: 10.1114/1.1326031 <http://dx.doi.org/10.1114/1.1326031>`__,
+   2000,
+   `https://doi.org/10.1114/1.1326031 <https://doi.org/10.1114/1.1326031>`_.
+
+.. [Ref13]
+   **L. Formaggia, A. Quarteroni and A. Veneziani**. *Cardiovascular Mathematics: Modeling and Simulation of the Circulatory System*,
+   *MS\&A*,
+   Springer,
+   2009.
+
+.. [Ref14]
+   **J. Alastruey, S. M. Moore, K. H. Parker, T. David, J. Peiro and S. J. Sherwin**. Reduced Modelling of Blood Flow in the Cerebral Circulation: Coupling 1-D, 0-D and Cerebral Auto-Regulation Models,
+   *International Journal for Numerical Methods in Fluids*,
+   56(8),
+   pp. 1061-1067,
+   `doi: 10.1002/fld.1606 <http://dx.doi.org/10.1002/fld.1606>`__,
+   2008,
+   `http://dx.doi.org/10.1002/fld.1606 <http://dx.doi.org/10.1002/fld.1606>`_.
+
+.. [Ref15]
+   **A. Zambanini, S. L. Cunningham, K. H. Parker, A. W. Khir, S. A. M. Thom and A. D. Hughes**. Wave-Energy Patterns in Carotid, Brachial, and Radial Arteries: a Noninvasive Approach Using Wave-Intensity Analysis,
+   *American Journal of Physiology - Heart and Circulatory Physiology*,
+   289(1),
+   pp. H270-H276,
+   `doi: 10.1152/ajpheart.00636.2003 <http://dx.doi.org/10.1152/ajpheart.00636.2003>`__,
+   2005.
+

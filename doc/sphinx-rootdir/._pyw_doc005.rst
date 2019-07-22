@@ -1,0 +1,84 @@
+.. !split
+
+.. _ch:appAlabel:
+
+Appendix A: Non-linear system at conjuctions
+============================================
+
+Bifurcation case
+----------------
+As explained in section (:ref:`sec_Bif_BC`), there are six unknowns at each bifurcation point. These unknowns are 
+
+.. _Eq:_auto38:
+
+.. math::
+
+    \begin{pmatrix}
+        x_1 = A_p^{n+1} & x_2 = q_p^{n+1} \\ 
+        x_3 = A_{d_1}^{n+1} & x_4 = q
+        _{d_1}^{n+1} \\ 
+        x_5 = A_{d_2}^{n+1} & x_6 = q_{d_2}^{n+1} \\ 
+        \end{pmatrix}
+        
+        
+
+Thus, if we substitute the pressure-area relationship with Eq. :ref:`(41) <Eq:eq:pressure_area_f>` the non-linear algebraic system of the six equation can be written with respect to :math:`x_i` variables as
+
+.. _Eq:_auto39:
+
+.. math::
+
+    \begin{pmatrix}
+        & \mathcal{R}_1 = - x_2 + x_4 + x_6 \\ 
+        & \mathcal{R}_2 = - \frac{1}{2}\rho \left( \frac{x_2}{x_1} \right)^2 - f((r_0)_{x=L}^p, \mathbf{k})\left(\sqrt{\frac{x_1}{(A_0)_{x=L}^p}} - 1 \right) + \frac{1}{2}\rho \left( \frac{x_4}{x_3} \right)^2 + f((r_0)_{x=0}^{d_1}, \mathbf{k})\left(\sqrt{\frac{x_3}{(A_0)_{x=0}^{d_1}}} - 1 \right) \\ 
+        & \mathcal{R}_3 = - \frac{1}{2}\rho \left( \frac{x_2}{x_1} \right)^2 - f((r_0)_{x=L}^p, \mathbf{k})\left(\sqrt{\frac{x_1}{(A_0)_{x=L}^p}} - 1 \right) + \frac{1}{2}\rho \left( \frac{x_6}{x_5} \right)^2 + f((r_0)_{x=0}^{d_2}, \mathbf{k})\left( \sqrt{\frac{x_5}{(A_0)_{x=0}^{d_2}}} - 1 \right) \\ 
+        & \mathcal{R}_4 = -\frac{x_2}{x_1} - 4c(x_1) + (W_f)_p^{n+1} \\ 
+        & \mathcal{R}_5 = -\frac{x_4}{x_3} + 4c(x_3) + (W_b)_{d_1}^{n+1} \\ 
+        & \mathcal{R}_6 = -\frac{x_6}{x_5} + 4c(x_5) + (W_b)_{d_2}^{n+1}
+        \end{pmatrix}
+        
+        
+
+with :math:`\mathcal{R}_i` the residual function which is given as input to Newton-Raphson solver function. In addition to residual functions, the Jacobian of the residuals should be provided, as well. There are two options for the Jacobian calculation. The first is to define it analytically and the second is to calculate the Jacobian matrix numerically via finite differences (find a citation). In this case, since we now the analytical expression of the residual functions, the Jacobian can easily obrained analytically as follows
+
+.. _Eq:_auto40:
+
+.. math::
+
+    \mathcal{\mathbf{J}_{R}} = \frac{\partial \mathbf{\mathcal{R}}}{\partial \mathbf{x}}= \frac{\partial \mathcal{R}_i}{\partial x_j} =  
+        \begin{pmatrix}
+         \frac{\partial R_1}{\partial x_1} & \frac{\partial R_1}{\partial x_2} & \frac{\partial R_1}{\partial x_3} & \frac{\partial R_1}{\partial x_4} & \frac{\partial R_1}{\partial x_5} & \frac{\partial R_1}{\partial x_6} \\ 
+        \\ 
+        \frac{\partial R_2}{\partial x_2} & \frac{\partial R_2}{\partial x_2} & \frac{\partial R_2}{\partial x_3} & \frac{\partial R_2}{\partial x_4} & \frac{\partial R_2}{\partial x_5} & \frac{\partial R_2}{\partial x_6} \\ 
+        \\ 
+        \frac{\partial R_3}{\partial x_3} & \frac{\partial R_3}{\partial x_2} & \frac{\partial R_3}{\partial x_3} & \frac{\partial R_3}{\partial x_4} & \frac{\partial R_3}{\partial x_5} & \frac{\partial R_3}{\partial x_6} \\ 
+        \\ 
+        \frac{\partial R_4}{\partial x_1} & \frac{\partial R_4}{\partial x_2} & \frac{\partial R_4}{\partial x_3} & \frac{\partial R_4}{\partial x_4} & \frac{\partial R_4}{\partial x_5} & \frac{\partial R_4}{\partial x_6} \\ 
+        \\ 
+        \frac{\partial R_5}{\partial x_1} & \frac{\partial R_5}{\partial x_2} & \frac{\partial R_5}{\partial x_3} & \frac{\partial R_5}{\partial x_4} & \frac{\partial R_5}{\partial x_5} & \frac{\partial R_5}{\partial x_6} \\ 
+        \\ 
+        \frac{\partial R_6}{\partial x_1} & \frac{\partial R_6}{\partial x_2} & \frac{\partial R_6}{\partial x_3} & \frac{\partial R_6}{\partial x_4} & \frac{\partial R_6}{\partial x_5} & \frac{\partial R_6}{\partial x_6} \\ 
+         \end{pmatrix}
+        
+        
+
+with :math:`(\partial \mathcal{R}_i)/(\partial x_j)` calculated as
+
+.. math::
+        
+        \displaystyle
+        \begin{pmatrix}
+         0 & -1 & 0 & 1 & 0 & 1 \\ 
+        \\ 
+        \frac{\rho x_2^2}{x_1^3} - \frac{f_{x=L}^p (x_1^{-1/2})_{x=L}^p}{2 A_0^{1/2}} & -\frac{\rho x_2}{x_1^2} & - \frac{\rho x_4^2}{x_3^3} + \frac{f_{x=0}^{d_1} (x_3^{-1/2})_{x=0}^{d_1}}{2 A_0^{1/2}} & \frac{\rho x_4}{x_3^2} & 0 & 0 \\ 
+        \\ 
+        \frac{\rho x_2^2}{x_1^3} - \frac{f_{x=L}^p (x_1^{-1/2})_{x=L}^p}{2 A_0^{1/2}} & -\frac{\rho x_2}{x_1^2} & 0 & 0 & - \frac{\rho x_6^2}{x_5^3} + \frac{f_{x=0}^{d_2} (x_5^{-1/2})_{x=0}^{d_2}}{2 A_0^{1/2}} & \frac{\rho x_6}{x_5^2} \\ 
+        \\ 
+        \frac{x_2}{x_1^2} - 4\frac{\partial c(x_1)}{\partial x_1} & -\frac{1}{x_1} & 0 & 0 & 0 & 0 \\ 
+        \\ 
+        0 & 0 & \frac{x_4}{x_3^2} + 4\frac{\partial c(x_3)}{\partial x_3} & -\frac{1}{x_3} & 0 & 0 \\ 
+        \\ 
+        0 & 0 & 0 & 0 & \frac{x_6}{x_5^2} + 4\frac{\partial c(x_5)}{\partial x_5} & -\frac{1}{x_5} 
+        \end{pmatrix}
+        
+
