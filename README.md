@@ -1,8 +1,8 @@
 # PylseWave
 
-![pylsewavelogo](./report/DocOnce/figures/pylsewave_logo.png =50x50)
+![pylsewavelogo](./doc/sphinx-rootdir/figures/pylsewave_logo.png)
 
-### A C++/Python package to solve pulse wave dynamics in arterial networks
+### A Python package to solve pulse wave dynamics in arterial networks
 
 The following diagram depicts the rationale along with the structure of the package
 
