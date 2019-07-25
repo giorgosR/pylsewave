@@ -28,5 +28,5 @@ test/*.pyc
 doc/_build/
 doc/_static/
 doc/_templates/
-doc/sphinx-rootdir/figures/*
+doc/sphinx-rootdir/figures/*.eps
 !doc/sphinx-rootdir/*.rst
