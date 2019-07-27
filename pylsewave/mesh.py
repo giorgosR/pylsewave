@@ -1,6 +1,7 @@
 """
 Pylsewave.mesh is a module that contains classes for vessel/tube and vessel network definition.
 """
+from __future__ import division
 import numpy as np
 
 __author__ = "Georgios E. Ragkousis"
@@ -405,3 +406,6 @@ class VesselNetwork(object):
         :type: float
         """
         return self._dx
+
+if __name__ == '__main__':
+    raise NotImplementedError('Module is not idented for direct execution')

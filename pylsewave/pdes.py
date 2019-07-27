@@ -1,7 +1,12 @@
-__author__ = "Georgios E. Ragkousis"
+"""
+pylsewave module with different pdes discretisations.
+"""
+from __future__ import division
 import numpy as np
-from pwutils import h_walls
-from mesh import VesselNetwork
+from pylsewave.pwutils import h_walls
+from pylsewave.mesh import VesselNetwork
+
+__author__ = "Georgios E. Ragkousis"
 
 class PDEm(object):
     """

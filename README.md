@@ -1,6 +1,6 @@
 # PylseWave
 
-![pylsewavelogo](./doc/sphinx-rootdir/figures/pylsewave_logo.png)
+![pylsewavelogo](./doc/sphinx-rootdir/figures/pylsewave_logo64x64.png)
 
 ### A Python package to solve pulse wave dynamics in arterial networks
 
@@ -32,6 +32,6 @@ mySolver = cMacCormackSolver(myBCs)
 mySolver.set_T(dt=dt, T=T, no_cycles=tc)
 mySolver.set_BC(U0_vessel, UL_vessel, UBif_vessel, UConj_vessel)
 # ------- SOLVE AND TIME --------------- #
-%time mySolver.solve(casename, myCallback, cfl_n=0.6, stability_safety_factor=1.0)
+mySolver.solve(casename, myCallback, cfl_n=0.6, stability_safety_factor=1.0)
 myCallback.close_file(casename)
 ```

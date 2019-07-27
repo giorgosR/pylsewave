@@ -1,3 +1,7 @@
+"""
+pylsewave module with interpolation classes and functions.
+"""
+from __future__ import division
 import numpy as np
 
 __author__ = "Georgios E. Ragkousis"
@@ -108,3 +112,6 @@ class CubicSpline(object):
 
 def linear_extrapolation(x, x1, x2, y1, y2):
     return y1 + (x - x1)*((y2 - y1)/(x2-x1))
+
+if __name__ == '__main__':
+    raise NotImplementedError('Module is not idented for direct execution')

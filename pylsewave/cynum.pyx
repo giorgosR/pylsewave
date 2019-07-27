@@ -430,7 +430,7 @@ cdef class cPDEm:
             self.vessels[i].dx = self.mesh.vessels[i].dx
 
             if self.mesh.vessels[i].RLC is not None:
-                self.vessels[i].RLC = np.array(self.mesh.vessels[i].RLC.values(), np.float)
+                self.vessels[i].RLC = np.array(list(self.mesh.vessels[i].RLC.values()), np.float)
 
     @cython.initializedcheck(False)
     @cython.boundscheck(False)

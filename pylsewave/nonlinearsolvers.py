@@ -1,3 +1,7 @@
+"""
+pylsewave module with non-linear solvers (e.g. Newton-Raphson)
+"""
+from __future__ import division
 import numpy as np
 import sys
 
@@ -16,7 +20,7 @@ def Newton(f, dfdx, x, eps, return_x_list=False):
         try:
             x = x - float(f_value)/dfdx(x)
         except ZeroDivisionError:
-            print "Error! - derivative zero for x = ", x
+            print("Error! - derivative zero for x = ", x)
             sys.exit(1)     # Abort with error
 
         f_value = f(x)
@@ -94,3 +98,6 @@ def Newton_system_conj_points(R, J, x, u, dt, vessel_indices, eps, N=100):
     if abs(R_norm) > eps:
         iteration_counter = -1
     return x, iteration_counter
+
+if __name__ == '__main__':
+    raise NotImplementedError('Module is not idented for direct execution')

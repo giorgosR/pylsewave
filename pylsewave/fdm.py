@@ -5,22 +5,25 @@ E.g. MacCormack, Lax-Wedroff, etc.
 Parts of this module have been recycled from `Finite difference computing with
 partial differential equations <https://github.com/hplgit/fdm-book>`_
 """
+from __future__ import division
+
 import numpy as np
 import os
 from timeit import default_timer as timer
 # from progress import progress_timer
-from mesh import VesselNetwork
-from nonlinearsolvers import Newton_system_conj_points
+from pylsewave.mesh import VesselNetwork
+from pylsewave.nonlinearsolvers import Newton_system_conj_points
 import sys
 from sys import stdout
-from pwutils import CV_fun, h_walls
-from cynum import pytdma
+from pylsewave.pwutils import CV_fun, h_walls
+from pylsewave.cynum import pytdma
 from pylsewave.pdes import PDEm
 # from scipy.optimize import fsolve
 
 
 __author__ = "Georgios E. Ragkousis"
 __acknowledgement__ = "Parts have been recycled from Hans Peter Langtangen"
+
 WRITE_STATUS = True
 PRINT_STATUS = False
 
@@ -598,3 +601,6 @@ class BloodWaveMacCormackGodunov(BloodWaveMacCormack):
                    gamma * F * a_ph * u[1, 2:])
 
         res = pytdma(lw, dia, upr, b[1:-1], u[1, 1:-1])
+
+if __name__ == '__main__':
+    raise NotImplementedError('Module is not idented for direct execution')

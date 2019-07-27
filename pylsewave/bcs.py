@@ -1,8 +1,13 @@
+"""
+pylsewave module containing classes for boundary conditions.
+"""
+from __future__ import division
+
+import numpy as np
+from pylsewave.pdes import PDEm
+
 __author__ = "Georgios E. Ragkousis"
 __acknowledgement__ = "U_L (outlet bc function) implemented/recycled from vamPy (https://github.com/akdiem/vampy)"
-import numpy as np
-from pdes import PDEm
-
 
 class BCs(object):
     """

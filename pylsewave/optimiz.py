@@ -1,3 +1,7 @@
+"""
+pylsewave module with optimisation classes.
+"""
+from __future__ import division
 import numpy as np
 from scipy.optimize import least_squares, differential_evolution
 
@@ -91,3 +95,6 @@ class OptimiseKVector(object):
     @property
     def k(self):
         return self._k
+
+if __name__ == '__main__':
+    raise NotImplementedError('Module is not idented for direct execution')

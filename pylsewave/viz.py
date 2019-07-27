@@ -1,3 +1,6 @@
+"""
+pylsewave module with vizualisation utils.
+"""
 import matplotlib.pyplot as plt
 from matplotlib import rcParams
 import numpy as np
@@ -296,7 +299,7 @@ class PlotAndStoreSolution:
             archive_name = '.' + hashed_input + '_archive.npz'
             filenames = glob.glob('.' + self.filename + '*.dat.npz')
             merge_zip_archives(filenames, archive_name)
-            print 'Archive name:', archive_name
+            print('Archive name:', archive_name)
             # data = numpy.load(archive); data.files holds names
             # data[name] extract the array
 
@@ -370,3 +373,6 @@ class PlotMediumAndSolution(PlotAndStoreSolution):
 
         if n == (len(t) - 1):  # finished with this run, close plot
             self.plt.close()
+
+if __name__ == '__main__':
+    raise NotImplementedError('Module is not idented for direct execution')

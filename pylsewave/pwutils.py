@@ -1,8 +1,12 @@
-__author__ = "Georgios E. Ragkousis"
+"""
+pylsewave module with functions.
+"""
+from __future__ import division
 import numpy as np
-from pwconsts import *
-from mesh import VesselNetwork
+from pylsewave.pwconsts import *
+from pylsewave.mesh import VesselNetwork
 
+__author__ = "Georgios E. Ragkousis"
 
 def convert_data_periodic(xdata, ydata, cycles=2, plot=False):
     """

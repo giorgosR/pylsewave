@@ -1,4 +1,8 @@
 # -*- coding: utf-8 -*-
+"""
+pylsewave module with constant variables.
+"""
+from __future__ import division
 __author__ = "Georgios E. Ragkousis"
 STATUS_OK = 0
 STATUS_ERROR = -1

@@ -1,6 +1,7 @@
 """
 Module with post-processing classes.
 """
+from __future__ import division
 import numpy as np
 from scipy import interpolate
 import matplotlib.pyplot as plt
@@ -337,3 +338,6 @@ class VizVessel(object):
     @property
     def q(self):
         return self._q
+
+if __name__ == '__main__':
+    raise NotImplementedError('Module is not idented for direct execution')
