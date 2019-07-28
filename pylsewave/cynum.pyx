@@ -1918,8 +1918,8 @@ cdef class cFDMSolver:
     @cython.wraparound(False)
     @cython.initializedcheck(False)
     @cython.cdivision(True)
-    cpdef SOLVER solve(self, string casename, user_action=None,
-              version="vectorised"):
+    cpdef SOLVER solve(self, user_action=None,
+              version="vectorised") except *:
 #         self._pdes = pdes
 #         self._dt = self._t[1] - self._t[0]
 #         if cfl_n is not None:
@@ -1934,14 +1934,14 @@ cdef class cFDMSolver:
             # --- Make hash of all input data ---
         # clever way of checking whether the analysis has run ag
         # ain
-        import hashlib
-        import inspect
-        data = (str(self._dt) + '_' +
-                str(self._T) + '_')
-        hashed_input = casename + hashlib.sha1(data).hexdigest()
-        if os.path.isfile('.' + hashed_input + '_archive.npz'):
-            # Simulation is already run
-            return -1, hashed_input
+        # import hashlib
+        # import inspect
+        # data = (str(self._dt) + '_' +
+        #         str(self._T) + '_')
+        # hashed_input = casename + hashlib.sha1(data.encode('utf-8')).hexdigest()
+        # if os.path.isfile('.' + hashed_input + '_archive.npz'):
+        #     # Simulation is already run
+        #     return -1, hashed_input
 
         cdef Py_ssize_t siz_i
         cdef vector[U] v_U
@@ -2429,8 +2429,8 @@ cdef class cMacCormackGodunovSplitSolver(cMacCormackSolver):
     @cython.wraparound(False)
     @cython.initializedcheck(False)
     @cython.cdivision(True)
-    cpdef SOLVER solve(self, string casename, user_action=None,
-              version="vectorised"):
+    cpdef SOLVER solve(self, user_action=None,
+              version="vectorised") except *:
 
         cdef Py_ssize_t length, len_x, i, j, n, i_bcs
         cdef double[::1] getarr = np.zeros(2, np.float)
@@ -2442,14 +2442,14 @@ cdef class cMacCormackGodunovSplitSolver(cMacCormackSolver):
             # --- Make hash of all input data ---
         # clever way of checking whether the analysis has run ag
         # ain
-        import hashlib
-        import inspect
-        data = (str(self._dt) + '_' +
-                str(self._T) + '_')
-        hashed_input = casename + hashlib.sha1(data).hexdigest()
-        if os.path.isfile('.' + hashed_input + '_archive.npz'):
-            # Simulation is already run
-            return -1, hashed_input
+        # import hashlib
+        # import inspect
+        # data = (str(self._dt) + '_' +
+        #         str(self._T) + '_')
+        # hashed_input = casename + hashlib.sha1(data).hexdigest()
+        # if os.path.isfile('.' + hashed_input + '_archive.npz'):
+        #     # Simulation is already run
+        #     return -1, hashed_input
 
         cdef Py_ssize_t siz_i
         cdef vector[U] v_U

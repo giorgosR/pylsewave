@@ -78,7 +78,7 @@ class CubicSpline(object):
         while 1:
             if (iRight - iLeft) <= 1:
                 return iLeft
-            i = (iLeft + iRight) / 2
+            i = (iLeft + iRight) // 2
             if x < self.xdata[i]:
                 iRight = i
             else:

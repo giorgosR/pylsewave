@@ -177,7 +177,7 @@ def run_Adan_77_case(idatafile, ibcsinflowfile, oresfile, language,
     # Mynard
     k = np.array([33.7e-03, 0.3, -0.9])
 
-    nu = CONSTANT_mu / CONSTANT_rho
+    nu = CONSTANT_MU_BLOOD / CONSTANT_RHO_BLOOD
 
     T_cycle = 1.0
     tc = 4
@@ -188,7 +188,7 @@ def run_Adan_77_case(idatafile, ibcsinflowfile, oresfile, language,
     p0 = 0.01  # Mpa
 
     # -------  LOAD ARTERIAL SEGMENTS  ------- #
-    print k
+    print(k)
     segments = []
     for i in range(data.shape[0]):
         segments.append(Vessel(name=data[i, 1], L=float(data[i, 2]) * 10.,
@@ -247,11 +247,11 @@ def run_Adan_77_case(idatafile, ibcsinflowfile, oresfile, language,
                    [67, 68], [71, 72], [74, 75], [75, 76]]
 
     for i in terminal_vessels.keys():
-        c0_distal = compute_c(segments[i].r_dist, k)
+        c0_distal = compute_c(segments[i].r_dist, k, CONSTANT_RHO_BLOOD)
         #     print c0_distal
         A0_distal = np.pi * ((segments[i].r_dist) ** 2)
         # R1 should be the same with the input characteristic impedance
-        Z1_distal = (CONSTANT_rho * c0_distal) / A0_distal
+        Z1_distal = (CONSTANT_RHO_BLOOD * c0_distal) / A0_distal
 
         R1 = terminal_vessels[i][0]
         R2 = terminal_vessels[i][1]
@@ -262,9 +262,7 @@ def run_Adan_77_case(idatafile, ibcsinflowfile, oresfile, language,
     # create the Arterial Network domain/mesh
     # Reflecting BCs
     Nx = None
-    vesssel_network = VesselNetwork(vessels=segments,
-                                    rho=CONSTANT_rho, Re=0.,
-                                    p0=p0, dx=4.5, Nx=Nx)
+    vesssel_network = VesselNetwork(vessels=segments, dx=4.5, Nx=Nx)
 
     # give a name for the output database file
     casename = "/results/" + oresfile
@@ -274,7 +272,7 @@ def run_Adan_77_case(idatafile, ibcsinflowfile, oresfile, language,
     siz_ves = len(vesssel_network.vessels)
     compare_l_c0 = []
     for i in range(siz_ves):
-        c_max = np.max(compute_c(vesssel_network.vessels[i].r0, k))
+        c_max = np.max(compute_c(vesssel_network.vessels[i].r0, k, CONSTANT_RHO_BLOOD))
         A = np.pi*(vesssel_network.vessels[i].r_prox*vesssel_network.vessels[i].r_prox)
         compare_l_c0.append(vesssel_network.vessels[i].length / c_max)
     
@@ -285,10 +283,10 @@ def run_Adan_77_case(idatafile, ibcsinflowfile, oresfile, language,
     # Nx_i = 1
     min_time = []
     for i in range(siz_ves):
-        Nx_i = 4*np.floor((vesssel_network.vessels[i].length / compute_c(vesssel_network.vessels[i].r_prox, k))/(min_value))
+        Nx_i = 4*np.floor((vesssel_network.vessels[i].length / compute_c(vesssel_network.vessels[i].r_prox, k, CONSTANT_RHO_BLOOD))/(min_value))
         dx_i = vesssel_network.vessels[i].length / Nx_i
         vesssel_network.vessels[i].dx = dx_i
-        min_time.append(dx_i/np.max(compute_c(vesssel_network.vessels[i].r0, k)))
+        min_time.append(dx_i/np.max(compute_c(vesssel_network.vessels[i].r0, k, CONSTANT_RHO_BLOOD)))
     
     CFL = 0.5
     dt = CFL*(min(min_time))
@@ -304,18 +302,18 @@ def run_Adan_77_case(idatafile, ibcsinflowfile, oresfile, language,
                                       screen_movie=True, backend=None,
                                       filename='/results/tmpdata')
     if language == 'cy':
-        myPDEs = cPDEsWat(vesssel_network)
+        myPDEs = cPDEsWat(vesssel_network, rho=CONSTANT_RHO_BLOOD, mu=CONSTANT_MU_BLOOD)
         myBCs = BCsADAN56(myPDEs, q_inlet_bc.eval_spline)
     
         U0_vessel = np.array([0],dtype=np.int)
-        UL_vessel = np.array(terminal_vessels.keys())
+        UL_vessel = np.array(list(terminal_vessels.keys()))
         UBif_vessel = np.array(bif_vessels)
         UConj_vessel = np.array(conj_points)
     
         mySolver = cMacCormackSolver(myBCs)
         mySolver.set_T(dt=dt, T=T, no_cycles=tc)
         mySolver.set_BC(U0_vessel, UL_vessel, UBif_vessel, UConj_vessel)
-        mySolver.solve(casename, myCallback)
+        mySolver.solve(myCallback)
         myCallback.close_file(casename)
 
     elif language == 'py':
