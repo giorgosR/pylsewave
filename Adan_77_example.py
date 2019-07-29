@@ -294,7 +294,7 @@ def run_Adan_77_case(idatafile, ibcsinflowfile, oresfile, language,
 
     # callback function to store solution
     number_of_frames = 200
-    skip = int(round(T / dt)) / number_of_frames
+    skip = int(round(T / dt)) // number_of_frames
     umin = 0.1
     umax = 1.5
     myCallback = PlotAndStoreSolution(casename=casename, umin=umin,

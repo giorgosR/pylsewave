@@ -91,23 +91,22 @@ class ExtractUVectors(object):
                     p.append(self.odbf[key][2, :])
 
         A, q, p = np.asarray(A), np.asarray(q), np.asarray(p)
-
-        A_cycle = A[len(self.t) - (len(self.t) / cycle)::].T
-        q_cycle = q[len(self.t) - (len(self.t) / cycle)::].T
-        p_cycle = p[len(self.t) - (len(self.t) / cycle)::].T
+        A_cycle = A[len(self.t) - (len(self.t) // cycle)::].T
+        q_cycle = q[len(self.t) - (len(self.t) // cycle)::].T
+        p_cycle = p[len(self.t) - (len(self.t) // cycle)::].T
         u_cycle = q_cycle / A_cycle
 
-        f = interpolate.interp2d(self.t[len(self.t) - (len(self.t) / cycle)::],
+        f = interpolate.interp2d(self.t[len(self.t) - (len(self.t) // cycle)::],
                                  self.x, q_cycle, kind="cubic")
-        g = interpolate.interp2d(self.t[len(self.t) - (len(self.t) / cycle)::],
+        g = interpolate.interp2d(self.t[len(self.t) - (len(self.t) // cycle)::],
                                  self.x, p_cycle, kind="cubic")
-        k = interpolate.interp2d(self.t[len(self.t) - (len(self.t) / cycle)::],
+        k = interpolate.interp2d(self.t[len(self.t) - (len(self.t) // cycle)::],
                                  self.x, A_cycle, kind="cubic")
-        l = interpolate.interp2d(self.t[len(self.t) - (len(self.t) / cycle)::],
+        l = interpolate.interp2d(self.t[len(self.t) - (len(self.t) // cycle)::],
                                  self.x, u_cycle, kind="cubic")
 
         if no_points:
-            selected_t = np.linspace(self.t[len(self.t) - (len(self.t) / cycle)], self.t[-1], no_points)
+            selected_t = np.linspace(self.t[len(self.t) - (len(self.t) // cycle)], self.t[-1], no_points)
             selected_x = np.linspace(0., self.x[-1], no_points)
             T, X = np.meshgrid(selected_t, selected_x)
             Q = f(selected_t, selected_x)
@@ -116,12 +115,12 @@ class ExtractUVectors(object):
             U = l(selected_t, selected_x)
 
         else:
-            x = np.linspace(0., self.x[-1], len(self.t[len(self.t) - (len(self.t) / cycle)::]))
-            T, X = np.meshgrid(self.t[len(self.t) - (len(self.t) / cycle)::], x)
-            Q = f(self.t[len(self.t) - (len(self.t) / cycle)::], x)
-            P = g(self.t[len(self.t) - (len(self.t) / cycle)::], x)
-            A = k(self.t[len(self.t) - (len(self.t) / cycle)::], x)
-            U = l(self.t[len(self.t) - (len(self.t) / cycle)::], x)
+            x = np.linspace(0., self.x[-1], len(self.t[len(self.t) - (len(self.t) // cycle)::]))
+            T, X = np.meshgrid(self.t[len(self.t) - (len(self.t) // cycle)::], x)
+            Q = f(self.t[len(self.t) - (len(self.t) // cycle)::], x)
+            P = g(self.t[len(self.t) - (len(self.t) // cycle)::], x)
+            A = k(self.t[len(self.t) - (len(self.t) // cycle)::], x)
+            U = l(self.t[len(self.t) - (len(self.t) // cycle)::], x)
 
         self.meshgrid_T = T
         self.meshgrid_X = X

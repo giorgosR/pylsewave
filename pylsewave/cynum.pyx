@@ -1919,7 +1919,7 @@ cdef class cFDMSolver:
     @cython.initializedcheck(False)
     @cython.cdivision(True)
     cpdef SOLVER solve(self, user_action=None,
-              version="vectorised") except *:
+              version="vectorised"):
 #         self._pdes = pdes
 #         self._dt = self._t[1] - self._t[0]
 #         if cfl_n is not None:
@@ -2430,7 +2430,7 @@ cdef class cMacCormackGodunovSplitSolver(cMacCormackSolver):
     @cython.initializedcheck(False)
     @cython.cdivision(True)
     cpdef SOLVER solve(self, user_action=None,
-              version="vectorised") except *:
+              version="vectorised"):
 
         cdef Py_ssize_t length, len_x, i, j, n, i_bcs
         cdef double[::1] getarr = np.zeros(2, np.float)
