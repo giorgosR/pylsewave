@@ -24,10 +24,10 @@ ext_cynum = Extension("pylsewave.cynum",
                       extra_compile_args=['/Ot', '/openmp', '/EHsc', '/GA', '/favor:INTEL64'],
                       # extra_link_args=['-openmp'],
                       # include_path = ["./pylsewave/include/",],
-                      include_dirs=["pylsewave/", numpy.get_include()]
+                      include_dirs=["pylsewave/include/", numpy.get_include()]
                       )
 
-setup(name="pylseWave",
+setup(name="pylsewave",
       version='1.0.0',
       packages=find_packages(),
       description='A python package for pulse wave dynamics and/or any hyperbolic system of PDEs',

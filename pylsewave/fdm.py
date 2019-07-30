@@ -18,6 +18,7 @@ from sys import stdout
 from pylsewave.pwutils import CV_fun, h_walls
 from pylsewave.cynum import pytdma
 from pylsewave.pdes import PDEm
+from pylsewave.bcs import BCs
 # from scipy.optimize import fsolve
 
 
@@ -34,11 +35,11 @@ class FDMSolver(object):
     """
     def __init__(self, inbcs):
         """
-        :param pylsewave.pdes.PDEm inbcs: class with the PDE definition
+        :param pylsewave.bcs.BCs inbcs: class with the bcs definition
         :raises TypeError: if the in pdes is not type pylsewave.pdes.PDEm
         """
-        if isinstance(inbcs, PDEm) is not True:
-            raise TypeError("The input PDEs should be of type pylsewave.pdes.PDEm!")
+        if isinstance(inbcs, BCs) is not True:
+            raise TypeError("The input PDEs should be of type pylsewave.bcs.BCs!")
         self._bcs = inbcs
         self._pdes = inbcs.pdes
         self.mesh = inbcs.mesh
@@ -142,7 +143,7 @@ class FDMSolver(object):
         import hashlib
         import inspect
         data = (str(self._dt) + '_' +
-                str(self._T) + '_')
+                str(self._T) + '_').encode('utf-8')
         hashed_input = casename + hashlib.sha1(data).hexdigest()
         if os.path.isfile('.' + hashed_input + '_archive.npz'):
             # Simulation is already run
@@ -153,33 +154,6 @@ class FDMSolver(object):
         u = [np.zeros((2, len(self.mesh.vessels[i].x))) for i in range(length)]
         u_n = [np.zeros((2, len(self.mesh.vessels[i].x))) for i in range(length)]
 
-        # c_max_i = []
-        # for i in range(length):
-        #     u_n[i] = self._bcs.I(self.mesh.vessels[i].x, i)
-        #     c_max_i.append(np.max(abs(self._pdes.compute_c(u_n[i][0, :], None, i))))
-        #
-        # # dt definition from CFL
-        # c_max = max(c_max_i)
-        # print c_max
-        # dx_min = min([self.mesh.vessels[i].dx for i in range(length)])
-        # self._dt = (dx_min * cfl_n * stability_safety_factor) / (c_max)
-        # self._Nt = int(round(self._T / self._dt))
-        # self._t = np.linspace(0.0, self._Nt * self._dt, self._Nt + 1)
-        #
-        # self._dt = self._t[1] - self._t[0]
-
-        # # re-calculate the dx of each segment
-        # if self.mesh.Nx is None:
-        #     for i in range(length):
-        #         self.mesh.vessels[i].dx = (self._dt*c_max_i[i])/(cfl_n*stability_safety_factor)
-        # else:
-        #     for i in range(length):
-        #         dx = (self._dt*c_max_i[i])/(cfl_n*stability_safety_factor)
-        #         Nx = int(round(self.mesh.vessels[i].length / dx))
-        #         if Nx < self.mesh.Nx:
-        #             dx = self.mesh.vessels[i].length / self.mesh.Nx
-        #         self.mesh.vessels[i].dx = dx
-
         # --- Allocate memomry for solutions ---
         u_store = [np.zeros((3, len(self.mesh.vessels[i].x))) for i in range(length)]
         u = [np.zeros((2, len(self.mesh.vessels[i].x))) for i in range(length)]
@@ -188,30 +162,12 @@ class FDMSolver(object):
         for i in range(length):
             u_n[i] = self._bcs.I(self.mesh.vessels[i].x, i)
 
-            # check CFL condition
-#             res = self.cfl_condition(u_n[i], self.mesh.vessels[i].dx, self._dt, i)
-#             if res is True:
-#                 pass
-#             else:
-#                 raise ValueError("The CFL condition hasn't been satisfied!/n"
-#                                  "Reduce dt")
             if user_action is not None:
                 p = self._pdes.pressure(u_n[i][0, :], vessel_index=i)
                 u_store[i][0:-1, :] = u_n[i].copy()
                 u_store[i][-1, :] = p.copy()
                 user_action(u_store[i], self.mesh.vessels[i].x, self._t, 0, PRINT_STATUS, WRITE_STATUS, i)
 
-        # c_max = max(c_max_i)
-        # dx_min = min([self.mesh.vessels[i].dx for i in range(length)])
-        # self._dt = (dx_min*cfl_n*stability_safety_factor)/(c_max)
-        # self._Nt = int(round(self._T / self._dt))
-        # self._t = np.linspace(0.0, self._Nt*self._dt, self._Nt + 1)
-
-        # for i in range(length):
-        #     self.mesh.vessels[i].dx = (self._dt*c_max_i[i])/(cfl_n*stability_safety_factor)
-
-        # if user_action is not None:
-        #     user_action.skip_frame = int(round(self._T / self._dt)) / 200
         print("Solver set to dt=%0.9f" % self._dt)
 
         self._It = range(0, self._Nt + 1)
@@ -445,7 +401,7 @@ class BloodWaveMacCormackGodunov(BloodWaveMacCormack):
         import hashlib
         import inspect
         data = (str(self._dt) + '_' +
-                str(self._T) + '_')
+                str(self._T) + '_').encode('utf-8')
         hashed_input = casename + hashlib.sha1(data).hexdigest()
         if os.path.isfile('.' + hashed_input + '_archive.npz'):
             # Simulation is already run

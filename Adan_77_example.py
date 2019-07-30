@@ -1,3 +1,14 @@
+"""
+Example file for pulsewave:
+
+to run with python:
+
+ >python Adan_77_example.py -ivesseldatafile data\Arterial_Network_ADAN56.txt -ibcinflowfile data\inflow_Aorta.txt -oresfile arterial_network_77_vessels -language py
+
+to run with cython
+
+>python Adan_77_example.py -ivesseldatafile data\Arterial_Network_ADAN56.txt -ibcinflowfile data\inflow_Aorta.txt -oresfile arterial_network_77_vessels -language cy
+"""
 __author__ = 'Georgios E. Ragkousis'
 import numpy as np
 import os
@@ -14,138 +25,6 @@ from pylsewave.pwutils import convert_data_periodic, compute_c, linear_extrapola
 # ---- SOLUTION WITH CYTHON CLASSES ----- #
 from pylsewave.cynum import cPDEsWat, BCsADAN56, cMacCormackSolver
 import argparse as argprs
-
-
-class partVessel(Vessel):
-    """
-    A class that inherits from Vessel.
-    It has been created for the AAA case.
-    """
-    @property
-    def r0(self):
-        return self._R0
-
-    @r0.setter
-    def r0(self, value):
-        self._R0 = value
-
-    @property
-    def id(self):
-        return self._Id
-
-    @id.setter
-    def id(self, value):
-        self._Id = value
-
-    def calculate_R0(self, x):
-        return self._R0
-
-    def interpolate_R0(self, value):
-        return self._R0
-
-
-class Aneurysm(Vessel):
-    """
-    Class inheritted from base Vessel.
-    With this class, a AAA geometry can be defined.
-    """
-    def __init__(self, *args, **kwargs):
-        super(Aneurysm, self).__init__(*args, **kwargs)
-        self.sigma = None
-        self.beta = None
-        self.max_radius = None
-        self.centre = None
-        self.r_anter = None
-        self.r_post = None
-
-    def set_params(self, sigma=30.0, beta=1.0, aneurysm_factor=0.5):
-        """Class method for Gaussian like bell definition
-        Args:
-            sigma (float): sigma factor of Gaussian distribution
-            beta (float): beta parameter
-            aneurysm_factor (float): aneurysm scaling factor
-
-        Returns:
-            None
-
-        """
-        self.sigma = sigma
-        self.beta = beta
-        self.max_radius = self.r_prox * (aneurysm_factor + 1.)
-
-    def calculate_R0(self, x):
-        """
-        Class method which overides the respective calculate_R0 of Vessel
-        :param x: spatial data
-        :return: Reference radius size of the AAA
-        """
-        z = np.zeros(self.x.shape[0])
-        for i in range(self.x.shape[0]):
-            z[i] = -0.5 * self.length + i * self.length / (self.x.shape[0] - 1)
-        # z = 0.5*self.length - x*self.length/(self.x.shape[0] - 1)
-        #         print z
-        point_gauss = (1 / ((2. * np.pi * self.sigma * self.sigma) ** 0.5)) * (
-        np.exp(1) ** (-0.5 * z ** 2 / self.sigma ** 2))
-        gauss_peak = np.max(point_gauss)
-        gauss_min = np.min(point_gauss)
-        scale = 2. * (self.max_radius - self.r_prox) / (gauss_peak + self.beta * gauss_peak)
-        # CALCULATION OF POINTS for ANTERIOR PROFILE
-        self.r_anter = (point_gauss * scale + self.r_prox)
-        #         self.r_anter = ((point_gauss - gauss_min)*(self.max_radius - self.r_prox))/((gauss_peak - gauss_min) + self.r_prox)
-        #         print self.r_anter
-        # CALCULATION OF POINTS for POSTERIOR PROFILE
-        self.r_post = -(point_gauss * scale * self.beta + self.r_prox)
-        #         self.r_post = -((point_gauss - gauss_min)*(self.max_radius - self.r_prox))/((gauss_peak - gauss_min) + self.r_prox)*self.beta
-        # CALCULATION OF POINTS for CENTRAL LINE
-        self.centre = 0.5 * (self.r_anter + self.r_post)
-        # Z_TRANSLATION
-        #         z = z + 0.5*self.length
-
-        return 0.5 * (self.r_anter - self.r_post)
-
-    def splitSegments(self, no_of_segments, list_borders, uniform=False):
-        """
-        Class method in case the user wants to split the AAA geometry in different vessels.
-        :param no_of_segments (int): the number of segments that the geometry will be split
-        :param list_borders (list [int]): a list with indices indication where the split will be performed.
-        :param uniform (bool): true if the vessel will be split uniformingly False otherwise
-        :return (list [Vessel]): A list containing all the vessels comprising the AAA geometry.
-        """
-        segments = []
-        pos = 0
-        previous_pos = 0
-        if uniform == False:
-            for i in range(no_of_segments):
-                len_segment = list_borders[i][1] - list_borders[i][0]
-                previous_pos += pos
-                r_prox = self.r0[previous_pos]
-                pos = int(round(len_segment / self.dx))
-                r_dist = self.r0[pos]
-                wall_thick = self._Wall_th
-
-                if i == 0:
-                    r0s = np.zeros(pos + 1, np.float)
-                    for j in range(pos + 1):
-                        r0s[j] = self.r0[previous_pos + j]
-                elif i != 0:
-                    r0s = np.zeros(pos, np.float)
-                    for j in range(pos):
-                        r0s[j] = self.r0[previous_pos + j]
-
-                segments.append(partVessel(name=self.name + "_PART_%d" % (i),
-                                           L=len_segment, R_proximal=r_prox,
-                                           R_distal=r_dist,
-                                           Wall_thickness=wall_thick, Id=None))
-                segments[i].r0 = r0s
-                segments[i].set_k_vector(self._k)
-                segments[i].dx = self.dx
-
-                if i != 0:
-                    segments[i].r0 = np.insert(segments[i].r0, 0, segments[i - 1].r0[-1])
-                    segments[i].dx = self.dx
-
-        return segments
-
 
 class ADANBC(BCsWat):
     """

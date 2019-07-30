@@ -156,11 +156,11 @@ class Vessel(object):
     @dx.setter
     def dx(self, dx):
         # here we reduce dx if the length of the segment is less than dx
-        if (int(round(self.length/dx)) + 1) == 1:
+        if (int(np.round(self.length//dx)) + 1) == 1:
             self._x = np.array([0., self.length])
         # self._dx = dx
         else:
-            self._x = np.linspace(0., self.length, int(round(self.length/dx)) + 1)
+            self._x = np.linspace(0., self.length, int(np.round(self.length//dx)) + 1)
         # make sure that dx is correct!
         self._dx = self._x[1] - self._x[0]
         # print self._dx

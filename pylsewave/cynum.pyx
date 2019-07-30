@@ -831,7 +831,7 @@ cdef class cPDEsWatVisco(cPDEsWat):
             self.vessels[i].phi = self.mesh.vessels[i].phi
 
             if self.mesh.vessels[i].RLC is not None:
-                self.vessels[i].RLC = np.array(self.mesh.vessels[i].RLC.values(), np.float)
+                self.vessels[i].RLC = np.array(list(self.mesh.vessels[i].RLC.values()), np.float)
 
 
     @cython.initializedcheck(False)
@@ -1788,6 +1788,9 @@ cdef class cBCsHandModelNonReflBcs(cBCsWat):
 
 
 cdef class cFDMSolver:
+    """
+    Base class for finite-difference computing schemes.
+    """
     cdef object mesh
     cdef cPDEm _pdes
     cdef cBCs _bcs
@@ -2230,6 +2233,26 @@ cdef class cFDMSolver:
 
 
 cdef class cLaxWendroffSolver(cFDMSolver):
+    """
+
+    Class with 2 step Lax-Wendroff scheme.
+
+    .. math::
+
+        U_i^{n+1} = U_i^{n} - \\frac{\\Delta t}{\\Delta x} \\left( F_{i + \\frac{1}{2}}^{n + \\frac{1}{2}}
+         - F_{i - \\frac{1}{2}}^{n + \\frac{1}{2}} \\right) +
+          \\frac{\\Delta t}{2}\\left( S_{i + \\frac{1}{2}}^{n + \\frac{1}{2}}
+           + S_{i - \\frac{1}{2}}^{n + \\frac{1}{2}} \\right)
+
+    where the intermediate values calculated as
+
+    .. math::
+
+        U_j^{n+\\frac{1}{2}} = \\frac{U_{j+1/2}^n + U_{j-1/2}^n}{2}
+         - \\frac{\\Delta t}{2 \\Delta x}\\left( F_{j+1/2} - F_{j-1/2} \\right)
+          + \\frac{\\Delta t}{4}\\left( S_{j+1/2} + S_{j-1/2}  \\right)
+
+    """
     @cython.initializedcheck(False)
     @cython.boundscheck(False)
     @cython.wraparound(False)
@@ -2293,6 +2316,25 @@ cdef class cLaxWendroffSolver(cFDMSolver):
                            dt2*(vec.S_nh_ph[1, i] + vec.S_nh_mh[1, i]))
 
 cdef class cMacCormackSolver(cFDMSolver):
+    """
+    Class with the MacCormack scheme implementation.
+
+    .. math::
+
+        U_i^{\\star} = U_i^n - \\frac{\\Delta t}{\\Delta x}\\left( F_{i+1}^n -
+         F_i^n \\right) + \\Delta t S_i^n
+
+
+
+    and
+
+    .. math::
+
+        U_i^{n+1} = \\frac{1}{2}\\left( U_i^n + U_i^{\\star} \\right)
+         - \\frac{\\Delta t}{2 \\Delta x}\\left( F_i^{\\star}
+          - F_{i-1}^{\\star} \\right) + \\frac{\\Delta t}{2}S_i^{\\star}
+
+    """
     @cython.initializedcheck(False)
     @cython.boundscheck(False)
     @cython.wraparound(False)
@@ -2342,7 +2384,9 @@ cdef class cMacCormackSolver(cFDMSolver):
 
 
 cdef class cMacCormackGodunovSplitSolver(cMacCormackSolver):
-
+    """
+    Solve U_t + F_x = S
+    """
     @cython.boundscheck(False)
     @cython.wraparound(False)
     @cython.initializedcheck(False)
