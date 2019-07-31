@@ -27,11 +27,6 @@ ctypedef np.float_t DTYPE_t
 cdef int STATUS_OK = 0
 cdef int STATUS_ERROR = -1
 
-# cdef double CONST_PHI = 5000.*1e-006
-# # viscosity of blood
-# cdef double CONSTANT_mu = 4.0e-09
-# # density of blood
-# cdef double CONSTANT_rho = 1.04e-09
 
 cdef class cyVessel(object):
     cdef Vessel *thisptr
@@ -68,14 +63,6 @@ cdef class cyVessel(object):
     @property
     def w_th(self):
         return self.thisptr.getWall_th()
-    #
-    # @property
-    # def RLC(self):
-    #     return self.thisptr.getRLC()
-    #
-    # @RLC.setter
-    # def RLC(self, dinput):
-    #     self.thisptr.setRLC(dinput)
 
     property RLC:
         def __get__(self):
@@ -136,10 +123,6 @@ cdef class cyVessel(object):
     @property
     def df_dx_mh(self):
         return np.asarray(self.thisptr.get_df_dx_mh())
-
-    # @dx.setter
-    # def dx(self, value):
-    #     self.thisptr.setdx(value)
 
     @property
     def k(self):
@@ -261,44 +244,9 @@ cdef class cyVesselNetworkSc(cyVesselNetwork):
             del self.thisptrDerived
 
 
-# # define ArrayWrapper as holding in a vector for memory management
-# cdef class ArrayWrapper:
-#    cdef vector[DTYPE_t] vec
-#    cdef Py_ssize_t shape[1]
-#    cdef Py_ssize_t strides[1]
-#
-#    # constructor and destructor are fairly unimportant now since
-#    # vec will be destroyed automatically.
-#
-#    cdef set_data(self, vector[DTYPE_t]& data):
-#       self.vec = move(data)
-#
-#    # now implement the buffer protocol for the class
-#    # which makes it generally useful to anything that expects an array
-#    def __getbuffer__(self, Py_buffer *buffer, int flags):
-#        # relevant documentation http://cython.readthedocs.io/en/latest/src/userguide/buffer.html#a-matrix-class
-#        cdef Py_ssize_t itemsize = sizeof(self.vec[0])
-#
-#        self.shape[0] = self.vec.size()
-#        self.strides[0] = sizeof(DTYPE_t)
-#        buffer.buf = <char *>&(self.vec[0])
-#        buffer.format = 'f'
-#        buffer.internal = NULL
-#        buffer.itemsize = itemsize
-#        buffer.len = self.v.size() * itemsize   # product(shape) * itemsize
-#        buffer.ndim = 1
-#        buffer.obj = self
-#        buffer.readonly = 0
-#        buffer.shape = self.shape
-#        buffer.strides = self.strides
-#        buffer.suboffsets = NULL
-
 cpdef double pystd_dev(np.ndarray[np.float64_t, ndim=1] a):
     return std_dev(<double*> a.data, a.size)
-#cdef vector[DTYPE_t] array = doit(length)
-#cdef ArrayWrapper w
-#w.set_data(array) # "array" itself is invalid from here on
-#numpy_array = np.asarray(w)
+
 cpdef int pytdma(np.ndarray[np.float64_t, ndim=1] a,
            np.ndarray[np.float64_t, ndim=1] b,
            np.ndarray[np.float64_t, ndim=1] c,
@@ -310,10 +258,12 @@ cpdef int pytdma(np.ndarray[np.float64_t, ndim=1] a,
     return tdma(<double*> a.data, <double*> b.data, <double*> c.data,
                 <double*> d.data, <double*> out.data, siz)
 
+
 cpdef int cpwgrad(np.ndarray[np.float64_t, ndim=1] inarr, np.ndarray[np.float64_t, ndim=1] out,
                   double dx):
     cdef Py_ssize_t siz = inarr.shape[0]
     return grad(<double*> inarr.data, <double*> out.data, dx, siz)
+
 
 @cython.boundscheck(False)
 @cython.wraparound(False)
@@ -1923,10 +1873,7 @@ cdef class cFDMSolver:
     @cython.cdivision(True)
     cpdef SOLVER solve(self, user_action=None,
               version="vectorised"):
-#         self._pdes = pdes
-#         self._dt = self._t[1] - self._t[0]
-#         if cfl_n is not None:
-#             self._C = cfl_n
+
         cdef Py_ssize_t length, len_x, i, j, n, i_bcs
         cdef double[::1] getarr = np.zeros(2, np.float)
         # array to store the wave speeds
@@ -1934,17 +1881,6 @@ cdef class cFDMSolver:
         cdef CFL res_cfl
         cdef SOLVER res_solver
         length = len(self.mesh.vessels)
-            # --- Make hash of all input data ---
-        # clever way of checking whether the analysis has run ag
-        # ain
-        # import hashlib
-        # import inspect
-        # data = (str(self._dt) + '_' +
-        #         str(self._T) + '_')
-        # hashed_input = casename + hashlib.sha1(data.encode('utf-8')).hexdigest()
-        # if os.path.isfile('.' + hashed_input + '_archive.npz'):
-        #     # Simulation is already run
-        #     return -1, hashed_input
 
         cdef Py_ssize_t siz_i
         cdef vector[U] v_U
@@ -1958,54 +1894,10 @@ cdef class cFDMSolver:
         # self._Ix = range(0, self._Nx + 1)
         self._It = np.arange(0, self._Nt + 1, dtype=np.int)
 
-        # # first calculate dt from c_max and dx_min
-        # c_max_i = []
-        # min_elem = []
-        # for i in range(length):
-        #     len_x = self.mesh.vessels[i].x.shape[0]
-        #     c_i = np.zeros(len_x, np.float)
-        #     for j in range(len_x):
-        #         self._bcs.I(self.mesh.vessels[i].x[j], j, i, getarr)
-        #         v_U[i].u_n[0, j] = getarr[0]
-        #         v_U[i].u_n[1, j] = getarr[1]
-        #     self._pdes.compute_c(v_U[i].u_n, i, c_i)
-        #     c_max_i.append(np.max(abs(np.array(c_i))))
-        #     min_elem.append(v_U[i].dx / c_max_i[i])
-        #
-        # # calculate c max
-        # c_max = max(c_max_i)
-        # min_value = min(min_elem)
-        # dx_min = min([self.mesh.vessels[i].dx for i in range(length)])
-        # self._dt = (min_value*cfl_n*stability_safety_factor)
-        # self._Nt = int(round(self._T / self._dt))
-        # self._t = np.linspace(0.0, self._Nt*self._dt, self._Nt + 1)
-
         self._dt = self._t[1] - self._t[0]
 
         print("Solver set to dt=%0.9f" % self._dt)
 
-        # re-calculate the dx of each segment
-        # if self.mesh.Nx is None:
-        #     for i in range(length):
-        #         self.mesh.vessels[i].dx = (self._dt*c_max_i[i])/(cfl_n*stability_safety_factor)
-        # else:
-        #     for i in range(length):
-        #         dx = (self._dt*c_max_i[i])/(cfl_n*stability_safety_factor)
-        #         Nx = int(round(self.mesh.vessels[i].length / dx))
-        #         if Nx < self.mesh.Nx:
-        #             dx = self.mesh.vessels[i].length / self.mesh.Nx
-        #         print("before vessel %d was %d" % (i, self.mesh.vessels[i].x.shape[0]))
-        #         self.mesh.vessels[i].dx = dx
-        #         # print self.mesh.vessels[i].x
-        #         print("after vessel %d was %d" % (i, self.mesh.vessels[i].x.shape[0]))
-
-        # apply IC and store solution at step = 1
-        # v_U = vector[U]()
-        # v_U.resize(length)
-        # self._pdes.mesh = self.mesh
-        # self._pdes.set_vessels(self._pdes.get_vessels(), length)
-        # self._bcs.set_vessels(self._pdes.get_vessels())
-        # self.initialise_solution_vector(v_U, length)
         # check with nogil here
         for i in range(length):
             len_x = self.mesh.vessels[i].x.shape[0]
@@ -2399,32 +2291,15 @@ cdef class cMacCormackGodunovSplitSolver(cMacCormackSolver):
         cdef double[::1] C_v = np.zeros(N_n, dtype=np.float)
 
         self._pdes.CV_f(u[0, :], vessel_index, C_v)
-        # C_v = CV_fun(self.mesh.vessels[vessel_index].r0,
-        #              self.mesh.vessels[vessel_index].w_th)
-        # self.C_v.push_back(C_v)
-        # dx = self.mesh.vessels[vessel_index].dx
-        F = dt / (dx * dx)
-        # N_n = u.shape[1]
-        # print("Segment no %d has %d nodes" % (vessel_index, N_n))
 
-        # dia = np.zeros(N_n - 2)
-        # lw = np.zeros(N_n - 3)
-        # upr = np.zeros(N_n - 3)
-        # d = np.zeros(N_n)
-        #
-        # a_ph = np.zeros(N_n-2, dtype=np.float)
-        # a_mh = np.zeros(N_n-2, dtype=np.float)
         for i in range(N_n-2):
             parStruct.a_ph[i] = 0.5 * (C_v[i+1] + C_v[i+2])
         # print(a_ph)
             parStruct.a_mh[i] = 0.5 * (C_v[i+1] + C_v[i])
             parStruct.b[i] = (1 + (u[0, i+1]/self._pdes._rho)*theta * F *
                               (parStruct.a_ph[i] + parStruct.a_mh[i]))
-        # parabStr[vessel_index].a_ph = <double[:N_n-2]>&a_ph[0]
-        # parabStr[vessel_index].a_ph = a_ph
-        # parabStr[vessel_index].a_mh = a_mh
+
         for i in range(N_n-3):
-        # dia = (1 + self._theta * F * (a_ph + a_mh))
             parStruct.a[i] = -(u[0, i+2]/self._pdes._rho)*theta * F * parStruct.a_mh[i+1]
             parStruct.c[i] = -(u[0, i+1]/self._pdes._rho)*theta * F * parStruct.a_ph[i]
 
@@ -2437,7 +2312,6 @@ cdef class cMacCormackGodunovSplitSolver(cMacCormackSolver):
                               (parStruct.a_ph[N_n-3] + parStruct.a_mh[N_n-3])) -\
                              (u[0, N_n-2]/self._pdes._rho)*theta * F * parStruct.a_ph[N_n-3]
 
-        # F = dt / (dx * dx)
         gamma = (1 - theta)
 
         for i in range(1, N_n-1):
@@ -2447,26 +2321,9 @@ cdef class cMacCormackGodunovSplitSolver(cMacCormackSolver):
                               parStruct.a_ph[i-1])) * u[1, i] +
                               (u[0,i]/self._pdes._rho)*gamma * F * parStruct.a_ph[i-1] * u[1, i+1])
 
-        # cdef double[::1] a = <double[:N_n-3]>&self.a[vessel_index][0]
-        # print("a: ", np.asarray(a))
-        # print("a shape: ", np.asarray(a).shape[0])
-        # cdef double[::1] b = <double[:N_n-2]>&self.b[vessel_index][0]
-        # cdef double[::1] c = <double[:N_n-3]>&self.c[vessel_index][0]
-        # print("c: ", np.asarray(c))
-        # print("c shape: ", np.asarray(c).shape[0])
-        # cdef double[::1] d = <double[:N_n]>&self.d[vessel_index][0]
-        # cdef np.ndarray[np.float64_t, ndim=1] a = np.asarray(<double[:N_n-3]>(self.a[vessel_index]))
-        # print(np.asarray(<double[::N_n-3]> self.a[vessel_index]))
-        # print(np.asarray(u)[1, 1:-1])
-        # res = pytdma(np.asarray(a), np.asarray(b), np.asarray(c), np.asarray(d)[1:-1],
-        #              np.asarray(u)[1, 1:-1])
-        # res = pytdma(np.asarray(parStruct.a), np.asarray(parStruct.b), np.asarray(parStruct.c),
-        #              np.asarray(parStruct.d)[1:-1], np.asarray(u)[1, 1:-1])
         res = tdma(&parStruct.a[0], &parStruct.b[0], &parStruct.c[0],
                    &parStruct.d[1:N_n-1][0], &u[1, 1:N_n-1][0], N_n-2)
-        # print("pass6")
-        # print(np.asarray(u)[1, 1:-1])
-        # print(self.a[vessel_index])
+
 
 
     @cython.boundscheck(False)
@@ -2483,17 +2340,6 @@ cdef class cMacCormackGodunovSplitSolver(cMacCormackSolver):
         cdef CFL res_cfl
         cdef SOLVER res_solver
         length = len(self.mesh.vessels)
-            # --- Make hash of all input data ---
-        # clever way of checking whether the analysis has run ag
-        # ain
-        # import hashlib
-        # import inspect
-        # data = (str(self._dt) + '_' +
-        #         str(self._T) + '_')
-        # hashed_input = casename + hashlib.sha1(data).hexdigest()
-        # if os.path.isfile('.' + hashed_input + '_archive.npz'):
-        #     # Simulation is already run
-        #     return -1, hashed_input
 
         cdef Py_ssize_t siz_i
         cdef vector[U] v_U
@@ -2511,10 +2357,6 @@ cdef class cMacCormackGodunovSplitSolver(cMacCormackSolver):
 
         print("Solver set to dt=%0.9f" % self._dt)
 
-        # here we declare a vector with double[:, ::1] to store parabolic solution
-        # cdef vector[cvisco] x_hyper
-        # x_hyper.resize(length)
-        # self._initialise_vectors_double_arrays(x_hyper, length)
         cdef vector[cParabolicSolObj] parU
         parU.resize(length)
         for i in range(length):
@@ -2527,14 +2369,6 @@ cdef class cMacCormackGodunovSplitSolver(cMacCormackSolver):
             parU[i].a_ph = np.zeros(N_n-2, dtype=np.float)
             parU[i].a_mh = np.zeros(N_n-2, dtype=np.float)
 
-        # print("pass")
-        # calculate all the vectors (lower, diagonal, upper)
-        # res = self._set_vectors_Godunov_spliting(parU)
-        # if res == STATUS_OK:
-        #     pass
-        # else:
-        #     print("Failed to initialise Godunov splitting matrices!")
-        #     return SOLVER.SOLVER_STATUS_ERROR
 
         # check with nogil here
         for i in range(length):
@@ -2678,9 +2512,6 @@ cdef class cMacCormackGodunovSplitSolver(cMacCormackSolver):
                         print("Solver failed in vessel %d in time increment %d  spatial %d and lenght=%d" % (i, n, j, v_U[i].x_size))
                         return SOLVER.SOLVER_STATUS_ERROR
                     else:
-                        # for j in range(v_U[i].x_size):
-                        #     getarr[0] = v_U[i].u[0, j]
-                        #     getarr[1] = v_U[i].u[1, j]
 
                         self._pdes.pressure_visco(v_U[i].u, i, v_U[i].u_store[2, :])
 
