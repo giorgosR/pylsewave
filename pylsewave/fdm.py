@@ -25,6 +25,8 @@ from pylsewave.bcs import BCs
 __author__ = "Georgios E. Ragkousis"
 __acknowledgement__ = "Parts have been recycled from Hans Peter Langtangen"
 
+STATUS_OK = 0
+STATUS_ERROR = -1
 WRITE_STATUS = True
 PRINT_STATUS = False
 
