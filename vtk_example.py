@@ -38,21 +38,6 @@ def vpwtkResMultiBlockFileWriter(ifilename, vessel_dict, vessel_map, ovisfile):
         spatial_data = np.loadtxt('./data/Adan_vessel_topology_2D/' + str(vessel_map[i]) + 'vessel_points.dat', delimiter=',')
         x = spatial_data[:, 0]
         y = spatial_data[:, 1]
-        # if vessel_dict[i] is -1:
-        #     print('Inverting the interpolation points in vessel_%d in monotonic order' % i)
-        #     x = x[::-1]
-        #     y = y[::-1]
-        #     try:
-        #         spline_ = UnivariateSpline(x, y, k=2, s=0)
-        #     except:
-        #         spline_ = interp1d(x, y)
-        #     XX[i] = np.linspace(x[0], x[-1], no_sampling_points)
-        #     YY[i] = spline_(XX[i])
-        #
-        #     XX[i] = XX[i][::-1]
-        #     YY[i] = YY[i][::-1]
-        # else:
-        #     spline_ = UnivariateSpline(x, y, k=2, s=0)
         spline_ = interp1d(x, y)
         XX[i] = np.linspace(x[0], x[-1], no_sampling_points)
         YY[i] = spline_(XX[i])
@@ -172,10 +157,7 @@ def vpwtkResPolyDataFileWriter(ifilename, vessel_dict):
         X = myodbf.meshgrid_X
 
         rws, clms = X.shape
-        # print(vtk.vtkVersion().GetVTKVersion())
-        # A_b, q_b, p_b, u_b = myodbf.getUVector(vessel_no=54, cycle=4, no_points=no_points)
-        # T_i = myodbf.meshgrid_T
-        # X_i = myodbf.meshgrid_X
+
         nodes = X[:, 0]
 
         num_points = nodes.shape[0]
@@ -195,22 +177,6 @@ def vpwtkResPolyDataFileWriter(ifilename, vessel_dict):
         if vessel_dict[i] is -1:
             XX[i] = XX[i][::-1]
             YY[i] = YY[i][::-1]
-    #    x = np.array([123.220, 137.205, 148.167, 151.568, 155.726,
-    #                  156.104, 156.104])*10
-    #    y = np.array([207.509, 193.146, 176.893, 156.860, 137.961,
-    #                  121.708, 113.015])*10
-    #    spline_ = UnivariateSpline(x, y, k=2, s=0)
-    #    XX = np.linspace(x[0], x[-1], num_points)
-    #    YY = spline_(XX)
-        # name_A = 'A'
-        # name_q = 'q'
-        # name_p = 'p'
-        # name_u = 'u'
-        # name_t = 't'
-        # name_x = 'x'
-        # kwards = {name_A: A_b, name_q: q_b, name_p: p_b, name_u: u_b, name_t: T_i, name_x: X_i}
-        # filename = './Vessel_%2d.dat' % vessel_no
-        # np.savez(filename, **kwards)
 
         num_points = nodes.shape[0]
     # num_points = 10
@@ -267,11 +233,6 @@ def vpwtkResPolyDataFileWriter(ifilename, vessel_dict):
                 id += 1
             lines.InsertNextCell(segment)
 
-
-        # # Create the polyline.
-        # lines = vtk.vtkCellArray()
-        # lines.InsertNextCell(segment)
-
         profileData = vtk.vtkPolyData()
         profileData.SetPoints(points)
         profileData.SetLines(lines)
@@ -280,14 +241,6 @@ def vpwtkResPolyDataFileWriter(ifilename, vessel_dict):
         profileData.GetPointData().AddArray(flow)
         profileData.GetPointData().AddArray(velocity)
         profileData.GetPointData().SetActiveScalars("radius")
-
-        # define unstructured grid
-        # aPolyGrid = vtk.vtkUnstructuredGrid()
-        # aPolyGrid.Allocate(1, 1)
-        # aPolyGrid.InsertNextCell(segment.GetCellType(), segment.GetPointIds())
-        # aPolyGrid.SetPoints(points)
-        # aPolyGrid.GetPointData().AddArray(radius)
-        # aPolyGrid.GetPointData().SetActiveScalars("radius")
 
         # Add thickness to the resulting line.
         profileTubes = vtk.vtkTubeFilter()
@@ -308,127 +261,6 @@ def vpwtkResPolyDataFileWriter(ifilename, vessel_dict):
 
         n += 1
     # ------------------------------------------ #
-#    drange = pressure.GetRange()
-#
-#    #region LOOKUP TABLE & SCALARBOX
-#    # add look up table
-#    lookupTable = vtk.vtkLookupTable()
-#    lookupTable.SetNumberOfColors(20)
-#    lookupTable.SetHueRange(0.667, 0)
-#    lookupTable.SetTableRange(drange)
-#    lookupTable.Build()
-#
-#    # add ScalarBar Actor and Set Properties
-#    activeScalarBar = vtk.vtkScalarBarActor()
-#    activeScalarBar.SetLookupTable(lookupTable)
-#    activeScalarBar.SetNumberOfLabels(3)
-#    activeScalarBar.GetPosition2Coordinate().SetCoordinateSystemToNormalizedViewport()
-#    activeScalarBar.SetHeight(0.4)
-#    activeScalarBar.SetWidth(0.1)
-#    activeScalarBar.SetLabelFormat("%.6f")
-#    activeScalarBar.SetTitle("pressure")
-#    activeScalarBar.SetTextPositionToPrecedeScalarBar()
-#    activeScalarBar.UseOpacityOff()
-#    activeScalarBar.VisibilityOn()
-#
-#    myText = vtk.vtkTextProperty()
-#    myText = activeScalarBar.GetLabelTextProperty()
-#    myText.SetFontSize(8)
-#    myText.ItalicOff()
-#    myText.BoldOff()
-#    myText.SetColor(0.0, 0.0, 0.0)
-#    myText.SetFontFamilyToTimes()
-#    myText.ShadowOff()
-#
-#    activeScalarBar.SetTitleTextProperty(myText)
-#    activeScalarBar.SetLabelTextProperty(myText)
-#    #endregion
-#    # ------------------------------------------ #
-#
-#
-#    profileMapper = vtk.vtkPolyDataMapper()
-#    profileMapper.SetInputConnection(profileTubes.GetOutputPort())
-#    # profileMapper.SetScalarRange(0,t)
-#    #Set this to Off to turn off color variation with scalar
-#    profileMapper.ScalarVisibilityOn()
-#    profileMapper.SetLookupTable(lookupTable)
-#    # profileMapper.SetScalarModeToUsePointFieldData()
-#    profileMapper.SetScalarRange(profileData.GetScalarRange())
-#
-#    profile = vtk.vtkActor()
-#    profile.SetMapper(profileMapper)
-#    # profile.GetProperty().SetSpecular(.3)
-#    # profile.GetProperty().SetSpecularPower(30)
-#
-#    # set the mapper
-#    aTetraMapper = vtk.vtkPolyDataMapper()
-#    aTetraMapper.SetInputData(profileData)
-#    aTetraMapper.SetLookupTable(lookupTable)
-#    aTetraMapper.SetScalarRange(profileData.GetScalarRange())
-#
-#    # set the actor
-#    aTetraActor = vtk.vtkActor()
-#    aTetraActor.SetMapper(aTetraMapper)
-#    # aTetraActor.AddPosition(4, 0, 0)
-#    # aTetraActor.GetProperty().SetDiffuseColor(0, 1, 0)
-#
-#    # ------------------------------------------ #
-#    # axes actor
-#    axesTriad = vtk.vtkAxesActor()
-#    axesTriad.AddPosition(0.0, 0.0, 0.0)
-#    axesTriad.SetShaftTypeToCylinder()
-#    axesTriad.SetXAxisLabelText("x")
-#    axesTriad.SetYAxisLabelText("y")
-#    axesTriad.SetZAxisLabelText("z")
-#    axesTriad.SetTotalLength(1.5, 1.5, 1.5)
-#
-#    # properties for the axis actor
-#    textXLabels = vtk.vtkTextProperty()
-#    textYLabels = vtk.vtkTextProperty()
-#    textZLabels = vtk.vtkTextProperty()
-#
-#    textXLabels.SetFontFamilyToTimes()
-#    textYLabels.SetFontFamilyToTimes()
-#    textZLabels.SetFontFamilyToTimes()
-#    textXLabels.SetFontSize(6)
-#    textYLabels.SetFontSize(6)
-#    textZLabels.SetFontSize(6)
-#
-#    axesTriad.GetXAxisCaptionActor2D().SetCaptionTextProperty(textXLabels)
-#    axesTriad.GetYAxisCaptionActor2D().SetCaptionTextProperty(textYLabels)
-#    axesTriad.GetZAxisCaptionActor2D().SetCaptionTextProperty(textZLabels)
-#    axesTriad.GetXAxisCaptionActor2D().GetCaptionTextProperty().ShadowOff()
-#    axesTriad.GetYAxisCaptionActor2D().GetCaptionTextProperty().ShadowOff()
-#    axesTriad.GetZAxisCaptionActor2D().GetCaptionTextProperty().ShadowOff()
-#
-#    axesWidget = vtk.vtkOrientationMarkerWidget()
-#    # place it at lower left corner
-#    #axesWidget.SetViewport(0.0, 0.0, 0.3, 0.3);
-#    axesWidget.SetOrientationMarker(axesTriad)
-#    axesWidget.SetInteractor(iren)
-#    axesWidget.EnabledOn()
-#    axesWidget.InteractiveOff()
-#    axesWidget.KeyPressActivationOff()
-#    # ------------------------------------------ #
-#
-#
-#    ren.AddActor(aTetraActor)
-#    ren.AddActor(profile)
-#    ren.AddActor2D(activeScalarBar)
-#
-#
-#    ren.ResetCamera()
-#    # ren.GetActiveCamera().Azimuth(30)
-#    # ren.GetActiveCamera().Elevation(20)
-#    # ren.GetActiveCamera().Dolly(2.8)
-#    # ren.ResetCameraClippingRange()
-#
-#    # Render the scene and start interaction.
-#    iren.Initialize()
-#    renWin.Render()
-#    axesWidget.On()
-#    iren.Start()
-#    iren.Disable()
 
     return STATUS_OK
 
