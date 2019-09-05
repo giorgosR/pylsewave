@@ -43,7 +43,6 @@ pylsewave.cynum
 .. automodule:: pylsewave.cynum
     :no-undoc-members:
     :members:
-    :undoc-members:
     :inherited-members:
     :show-inheritance:
 

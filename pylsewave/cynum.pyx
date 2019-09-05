@@ -268,6 +268,13 @@ cpdef int cpwgrad(np.ndarray[np.float64_t, ndim=1] inarr, np.ndarray[np.float64_
 @cython.boundscheck(False)
 @cython.wraparound(False)
 def cwrite2file(string filename, double[:, ::1] u):
+    """
+    Function to write results in a file.
+
+    :param filename: the name of the file
+    :param u: the solution vetctor
+    :return: int
+    """
     cdef int rws, clms
     rws = u.shape[0]
     clms = u.shape[1]
@@ -314,13 +321,13 @@ cdef struct cParabolicSolObj:
 
 cdef class cPDEm:
     """
-    .. math:
+    .. math::
 
         \\frac{\\partial U}{\\partial t} + \\frac{\\partial F}{\\partial x} = S(U)
 
     :param pylsewave.mesh.VesselNetwork mesh: the vessel network
     :param float rho: the density of fluid medium (e.g. blood, water, etc.)
-    :param: float mu: blood viscosity
+    :param float mu: blood viscosity
     :param float Re: the Reynolds number
     """
     cdef object mesh
@@ -349,9 +356,8 @@ cdef class cPDEm:
 
             \\delta = \\sqrt{\\frac{\\nu T_{cycle}}{2 \\pi}}
 
-        :param T: (float) Total period of the simulation
-        :param no_cycles: No of cycles that the simulation will run
-        :return: (float) Boundary layer delta
+        :param double T: Total period of the simulation
+        :param int no_cycles: No of cycles that the simulation will run
         """
         cdef double _nu = self._mu / self._rho
         cdef double T_cycle = T / no_cycles
@@ -387,6 +393,17 @@ cdef class cPDEm:
     @cython.wraparound(False)
     @cython.cdivision(True)
     cdef int flux(self, double[:, ::1] u, int x, int vessel_index, double[:, ::1] out_F) nogil:
+        """
+        Method to calculate the Flux term.
+
+        :param u: the solution vector u
+        :type priority: ndarray[ndim=2, dtype=float]
+        :param x: the spatial point index
+        :type priority: int
+        :param int vessel_index: the unique vessel Id
+        :param ndarray[ndim=2, dtype=float] out_F: the flux vector
+        :return: int
+        """
         cdef double A0, f_r0
         cdef np.intp_t siz, i
 
@@ -418,6 +435,17 @@ cdef class cPDEm:
     @cython.wraparound(False)
     @cython.cdivision(True)
     cpdef void flux_i(self, double[::1] u, int x, int index, int vessel_index, double[::1] out_f):
+        """
+        Method to calculate the Flux term.
+
+        :param u: the solution vector u
+        :type priority: float or ndarray[ndim=1, dtype=double]
+        :param x: the spatial point index
+        :type priority: int
+        :param int vessel_index: the unique vessel Id
+        :param ndarray[ndim=1, dtype=double] out_F: the flux vector
+        :return: int
+        """
         cdef double A0, f_r0
         cdef np.intp_t siz, i
 
@@ -452,6 +480,16 @@ cdef class cPDEm:
     @cython.wraparound(False)
     @cython.cdivision(True)
     cdef int source(self, double[:, ::1] u, int x, int vessel_index, double[:, ::1] out_S) nogil:
+        """
+        Method to calculate the Source term.
+
+        :param u: the solution vector u
+        :type priority: float or ndarray[ndim=2, dtype=double]
+        :param x: the spatial points discretising the 1D segments
+        :type priority: float or ndarray[ndim=2, dtype=double]
+        :param int vessel_index: the unique vessel Id
+        :param ndarray[ndim=2, dtype=double] out_S: the source vector 
+        """
         cdef double A0, R, f_r0, df_dr0, df_dx
         cdef np.intp_t siz, i
         cdef double _nu = ((self._mu)/self._rho)
@@ -495,6 +533,16 @@ cdef class cPDEm:
     @cython.wraparound(False)
     @cython.cdivision(True)
     cpdef void source_i(self, double[::1] u, int x, int index, int vessel_index, double[::1] out_s):
+        """
+        Method to calculate the Source term.
+
+        :param u: the solution vector u
+        :type priority: float or ndarray[ndim=1, dtype=double]
+        :param x: the spatial points discretising the 1D segments
+        :type priority: float or ndarray[ndim=1, dtype=double]
+        :param int vessel_index: the unique vessel Id
+        :param ndarray[ndim=1, dtype=double] out_S: the source vector 
+        """
         cdef double A0, R, f_r0, df_dr0, df_dx
         cdef double _nu = ((self._mu)/self._rho)
 
@@ -535,6 +583,18 @@ cdef class cPDEm:
     @cython.wraparound(False)
     @cython.cdivision(True)
     cdef double pressure_i(self, double a, int index, int vessel_index) nogil:
+        """
+        Method to compute pressure from pressure-area relationship
+
+        .. math::
+             p(A) = f(R_0, k) \\left( \\sqrt{\\ 1 - frac{A_0}{A}}\\right)
+
+        :param a: cross-sectional area of the vessel
+        :type priority: float or ndarray[ndim=1, type=double]
+        :param int index: index of the node in vessel
+        :param int vessel_index: the vessel unique Id
+        :return: double
+        """
         cdef double A0
         cdef double out
         A0 = M_PI*pow(self.vessels[vessel_index].r0[index], 2)
@@ -546,6 +606,18 @@ cdef class cPDEm:
     @cython.boundscheck(False)
     @cython.wraparound(False)
     cdef void pressure(self, double[:, ::1] u, int vessel_index, double[::1] out_p):
+        """
+        Method to compute pressure from pressure-area relationship
+
+        .. math::
+             p(A) = f(R_0, k) \\left( \\sqrt{\\ 1 - frac{A_0}{A}}\\right)
+
+        :param u: solution vector
+        :type priority: ndarray[ndim=2, type=double]
+        :param int index: index of the node in vessel
+        :param int vessel_index: the vessel unique Id
+        :param ndarray[ndim=1, type=double] out_p: the calculated pressue vector.
+        """
         cdef double A0
         cdef Py_ssize_t i, siz
         siz = u.shape[1]
@@ -558,6 +630,18 @@ cdef class cPDEm:
     @cython.boundscheck(False)
     @cython.wraparound(False)
     cpdef double compute_c_i(self, double a, int index, int vessel_index):
+        """
+        Method to compute local wave speed
+
+        .. math::
+             c(A) = -\\sqrt{\\frac{1}{2 \\rho} f(R_0, k) \\sqrt{\\frac{A_0}{A}}}
+
+        :param A: cross-sectional area of vessel
+        :type priority: double
+        :param int index: the number or the node to be calculated
+        :param vessel_index: the vessel unique Id
+        :return: double
+        """
         cdef double A0
         cdef double out
         A0 = M_PI*pow(self.vessels[vessel_index].r0[index], 2)
@@ -568,6 +652,18 @@ cdef class cPDEm:
     # @cython.cdivision(True)
     # @cython.boundscheck(False)
     cpdef void compute_c(self, double[:, ::1] u, int vessel_index, double[::1] out_c):
+        """
+        Method to compute local wave speed
+
+        .. math::
+             c(A) = -\\sqrt{\\frac{1}{2 \\rho} f(R_0, k) \\sqrt{\\frac{A_0}{A}}}
+
+        :param u: solution vector
+        :type priority: ndarray[ndim=2, type=double]
+        :param int index: the number or the node to be calculated
+        :param vessel_index: the vessel unique Id
+        :param ndarray[ndim=2, type=double] out_c: the calculated wave speed vector
+        """
         cdef double A0
         cdef Py_ssize_t i, siz
         siz = u.shape[1]
@@ -583,6 +679,18 @@ cdef class cPDEsWat(cPDEm):
     @cython.boundscheck(False)
     @cython.wraparound(False)
     cpdef double compute_c_i(self, double a, int index, int vessel_index):
+        """
+        Method to compute local wave speed
+
+        .. math::
+             c(A) = \\sqrt{\\frac{1}{2 \\rho} f(R_0, k) \\sqrt{\\frac{A}{A_0}}}
+
+        :param a: the cross sectional area of the vessel
+        :type priority: double
+        :param int index: the number or the node to be calculated
+        :param vessel_index: the vessel unique Id
+        :return: double
+        """
         cdef double A0
         cdef double out
         A0 = M_PI*pow(self.vessels[vessel_index].r0[index], 2)
@@ -594,6 +702,19 @@ cdef class cPDEsWat(cPDEm):
     @cython.boundscheck(False)
     @cython.wraparound(False)
     cpdef void compute_c(self, double[:, ::1] u, int vessel_index, double[::1] out_c):
+        """
+        Method to compute local wave speed
+
+        .. math::
+             c(A) = \\sqrt{\\frac{1}{2 \\rho} f(R_0, k) \\sqrt{\\frac{A}{A_0}}}
+
+        :param u: the solution vector
+        :type priority: ndarray[ndim=2, type=double]
+        :param int index: the number or the node to be calculated
+        :param vessel_index: the vessel unique Id
+        :param out_c: the calculated wave speed vector
+        :type priority: ndarray[ndim=1, type=double]
+        """
         cdef double A0
         cdef Py_ssize_t i, siz
         siz = u.shape[1]
@@ -606,6 +727,18 @@ cdef class cPDEsWat(cPDEm):
     @cython.wraparound(False)
     @cython.cdivision(True)
     cdef double pressure_i(self, double a, int index, int vessel_index) nogil:
+        """
+        Method to compute pressure from pressure-area relationship
+
+        .. math::
+             p(A) = f(R_0, k) \\left( \\sqrt{\\ frac{A}{A_0} - 1}\\right)
+
+        :param a: cross sectional area
+        :type priority: double
+        :param int index: index of the node in vessel
+        :param int vessel_index: the vessel unique Id
+        :return: double
+        """
         cdef double A0
         cdef double out
         A0 = M_PI*pow(self.vessels[vessel_index].r0[index], 2)
@@ -617,6 +750,18 @@ cdef class cPDEsWat(cPDEm):
     @cython.boundscheck(False)
     @cython.wraparound(False)
     cdef void pressure(self, double[:, ::1] u, int vessel_index, double[::1] out_p):
+        """
+        Method to compute pressure from pressure-area relationship
+
+        .. math::
+             p(A) = f(R_0, k) \\left( \\sqrt{\\ frac{A}{A_0} - 1}\\right)
+
+        :param u: solution vector
+        :type priority: ndarray[ndim=2, type=double]
+        :param int index: index of the node in vessel
+        :param int vessel_index: the vessel unique Id
+        :param ndarray[ndim=1, type=double] out_p: the calculated pressue vector.
+        """
         cdef double A0
         cdef Py_ssize_t i, siz
         siz = u.shape[1]
@@ -629,6 +774,17 @@ cdef class cPDEsWat(cPDEm):
     @cython.wraparound(False)
     @cython.cdivision(True)
     cdef int flux(self, double[:, ::1] u, int x, int vessel_index, double[:, ::1] out_F) nogil:
+        """
+        Method to calculate the Flux term.
+    
+        :param u: the solution vector u
+        :type priority: ndarray[ndim=2, dtype=double]
+        :param x: the spatial point
+        :type priority: int
+        :param int vessel_index: the unique vessel Id
+        :param ndarray[ndim=2, dtype=double] out_F: the flux vector
+        :return: int
+        """
         cdef double A0, f_r0
         cdef np.intp_t siz, i
 
@@ -660,6 +816,17 @@ cdef class cPDEsWat(cPDEm):
     @cython.wraparound(False)
     @cython.cdivision(True)
     cpdef void flux_i(self, double[::1] u, int x, int index, int vessel_index, double[::1] out_f):
+        """
+        Method to calculate the Flux term.
+
+        :param u: the solution vector u
+        :type priority: ndarray[ndim=1, dtype=double]
+        :param x: the spatial point index
+        :type priority: int
+        :param int vessel_index: the unique vessel Id
+        :param ndarray[ndim=1, dtype=double] out_F: the flux vector
+        :return: None
+        """
         cdef double A0, f_r0
         cdef np.intp_t siz, i
 
@@ -684,6 +851,16 @@ cdef class cPDEsWat(cPDEm):
     @cython.wraparound(False)
     @cython.cdivision(True)
     cdef int source(self, double[:, ::1] u, int x, int vessel_index, double[:, ::1] out_S) nogil:
+        """
+         Method to calculate the Source term.
+
+        :param u: the solution vector u
+        :type priority: ndarray[ndim=2, dtype=double]
+        :param x: the spatial point index
+        :type priority: int
+        :param int vessel_index: the unique vessel Id
+        :param ndarray[ndim=2, dtype=double] out_S: the source vector 
+        """
         cdef double A0, R, f_r0, df_dr0, df_dx
         cdef np.intp_t siz, i
         cdef double _nu = ((self._mu)/self._rho)
@@ -727,6 +904,16 @@ cdef class cPDEsWat(cPDEm):
     @cython.wraparound(False)
     @cython.cdivision(True)
     cpdef void source_i(self, double[::1] u, int x, int index, int vessel_index, double[::1] out_s):
+        """
+         Method to calculate the Source term.
+
+        :param u: the solution vector u
+        :type priority: ndarray[ndim=1, dtype=double]
+        :param x: the spatial point index
+        :type priority: int
+        :param int vessel_index: the unique vessel Id
+        :param ndarray[ndim=1, dtype=double] out_S: the source vector 
+        """
         cdef double A0, R, f_r0, df_dr0, df_dx
         cdef double _nu = ((self._mu)/self._rho)
 
@@ -762,6 +949,11 @@ cdef class cPDEsWat(cPDEm):
 
 # ------------------- -------------------------------------------------- ----------------------- #
 cdef class cPDEsWatVisco(cPDEsWat):
+    """
+    PDEs class to discretise a system with visco-elastic properties.
+
+    ..note:: see Watanabe at al.
+    """
     cpdef void set_vessels(self, vector[cvessel] &vectorV, int siz) except *:
         for i in range(siz):
             self.vessels[i].r0 = self.mesh.vessels[i].r0
@@ -790,6 +982,17 @@ cdef class cPDEsWatVisco(cPDEsWat):
     @cython.cdivision(True)
     cpdef void pressure_visco(self, double[:, ::1] u, int vessel_index,
      double[::1] out_p):
+        """
+        Method to compute pressure from pressure-area relationship
+
+        .. math::
+             p(A) = f(R_0, k) \\left( \\sqrt{\\frac{A}{A_0} - 1} - C_v \\frac{\\partial q}{\\partial x} \\right)
+
+        :param u: solution vector
+        :type priority: ndarray[ndim=2, type=double]
+        :param int vessel_index: the vessel unique Id
+        :param ndarray[ndim=1, type=double] out_p: the calculated pressue vector.
+        """
         cdef double A0
         cdef Py_ssize_t i, siz
         cdef int res
@@ -810,6 +1013,20 @@ cdef class cPDEsWatVisco(cPDEsWat):
     @cython.wraparound(False)
     @cython.cdivision(True)
     cpdef int CV_f(self, double[::1] a, Py_ssize_t vessel_index, double[::1] out):
+        """
+        Method to calculate the CV_f term
+        
+        .. math::
+             CV_f = \\frac{2}{3}\\left( \\frac{\\phi w_{th} \\sqrt{\\pi}}{A_0\\sqrt{a}} \\right)
+        
+        :param a: the cross-sectional area 
+        :type priority: ndarray[ndim=1, type=double]
+        :param vessel_index: the vessel index
+        :type priority: int
+        :param out: the calculated vector
+        :type priority: ndarray[ndim=1, type=double]
+        :return: int
+        """
         cdef Py_ssize_t i
         cdef int res
         cdef double A0
@@ -828,6 +1045,15 @@ cdef class cPDEsWatVisco(cPDEsWat):
     @cython.cdivision(True)
     @staticmethod
     cdef int wall_th_x(double[::1] r0, double[::1] out):
+        """
+        Method to calculate the wall thickness
+        
+        :param r0: the un-pressurised vessel radius
+        :type priority: ndarray[ndim=1, type=double]
+        :param out: the calculated wall thickness
+        :type priority: ndarray[ndim=1, type=double]
+        :return: int
+        """
         cdef Py_ssize_t i
         cdef Py_ssize_t siz = r0.shape[0]
         cdef double alpha = 0.2802
@@ -848,6 +1074,17 @@ cdef class PDEmCs(cPDEm):
     @cython.wraparound(False)
     @cython.cdivision(True)
     cdef int flux(self, double[:, ::1] u, int x, int vessel_index, double[:, ::1] out_F) nogil:
+        """
+        Method to calculate the Flux term.
+    
+        :param u: the solution vector u
+        :type priority: ndarray[ndim=2, dtype=double]
+        :param x: the spatial point
+        :type priority: int
+        :param int vessel_index: the unique vessel Id
+        :param ndarray[ndim=2, dtype=double] out_F: the flux vector
+        :return: int
+        """
         cdef double A0, f_r0
         cdef np.intp_t siz, i
 
@@ -879,6 +1116,17 @@ cdef class PDEmCs(cPDEm):
     @cython.wraparound(False)
     @cython.cdivision(True)
     cpdef void flux_i(self, double[::1] u, int x, int index, int vessel_index, double[::1] out_f):
+        """
+        Method to calculate the Flux term.
+    
+        :param u: the solution vector u
+        :type priority: ndarray[ndim=1, dtype=double]
+        :param x: the spatial point
+        :type priority: int
+        :param int vessel_index: the unique vessel Id
+        :param ndarray[ndim=1, dtype=double] out_F: the flux vector
+        :return: int
+        """
         cdef double A0, f_r0
         cdef np.intp_t siz, i
 
@@ -910,6 +1158,16 @@ cdef class PDEmCs(cPDEm):
     @cython.wraparound(False)
     @cython.cdivision(True)
     cdef int source(self, double[:, ::1] u, int x, int vessel_index, double[:, ::1] out_S) nogil:
+        """
+         Method to calculate the Source term.
+
+        :param u: the solution vector u
+        :type priority: ndarray[ndim=2, dtype=double]
+        :param x: the spatial point index
+        :type priority: int
+        :param int vessel_index: the unique vessel Id
+        :param ndarray[ndim=2, dtype=double] out_S: the source vector 
+        """
         cdef double A0, R, f_r0, df_dr0, df_dx
         cdef np.intp_t siz, i
 
@@ -953,6 +1211,16 @@ cdef class PDEmCs(cPDEm):
     @cython.wraparound(False)
     @cython.cdivision(True)
     cpdef void source_i(self, double[::1] u, int x, int index, int vessel_index, double[::1] out_s):
+        """
+         Method to calculate the Source term.
+
+        :param u: the solution vector u
+        :type priority: ndarray[ndim=1, dtype=double]
+        :param x: the spatial point index
+        :type priority: int
+        :param int vessel_index: the unique vessel Id
+        :param ndarray[ndim=1, dtype=double] out_S: the source vector 
+        """
         cdef double A0, R, f_r0, df_dr0, df_dx
 
         if x == 0:
@@ -993,6 +1261,18 @@ cdef class PDEmCs(cPDEm):
     @cython.boundscheck(False)
     @cython.wraparound(False)
     cpdef double compute_c_i(self, double a, int index, int vessel_index):
+        """
+        Method to compute local wave speed
+
+        .. math::
+             c(A) = -\\sqrt{\\frac{1}{2 \\rho} f(R_0, k) \\sqrt{\\frac{A_0)}{A}}}
+
+        :param a: the cross-sectional area of the vessel
+        :type priority: double
+        :param int index: the number or the node to be calculated
+        :param vessel_index: the vessel unique Id
+        :return: double
+        """
         cdef double A0
         cdef double out
         A0 = M_PI*pow(self.vessels[vessel_index].r0[index], 2)
@@ -1003,6 +1283,19 @@ cdef class PDEmCs(cPDEm):
     # @cython.cdivision(True)
     # @cython.boundscheck(False)
     cpdef void compute_c(self, double[:, ::1] u, int vessel_index, double[::1] out_c):
+        """
+        Method to compute local wave speed
+
+        .. math::
+             c(A) = -\\sqrt{\\frac{1}{2 \\rho} f(R_0, k) \\sqrt{\\frac{A_0)}{A}}}
+
+        :param u: the solution vector
+        :type priority: ndarray[ndim=2, type=double]
+        :param int index: the number or the node to be calculated
+        :param vessel_index: the vessel unique Id
+        :param out_c: the calculated wave speed vector
+        :type priority: ndarray[ndim=1, type=double]
+        """
         cdef double A0
         cdef Py_ssize_t i, siz
         siz = u.shape[1]
@@ -1012,6 +1305,12 @@ cdef class PDEmCs(cPDEm):
 
 
 cdef class cBCs:
+    """
+    Class to set boundary conditions. Inlet, outlet, bifs and conjs.
+
+    :param pylsewave.cynum.cPDEm inpdes: the discretised system of pdes.
+    :param inletfunc: a python function for inlet BCs.
+    """
     cdef cPDEm pdes
     cdef object mesh
     cdef object inlet_fun

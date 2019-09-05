@@ -69,3 +69,11 @@ conda install jupyter
 ```bash
 pip install jupyter
 ```
+
+### Build the docs
+
+To build the documentation, under the `docs` directory type (you will need sphinx):
+
+```bash
+make html
+```
