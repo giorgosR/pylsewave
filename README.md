@@ -77,3 +77,9 @@ To build the documentation, under the `docs` directory type (you will need sphin
 ```bash
 make html
 ```
+
+### Cite pylsewave
+
+Prefered citation style for pylsewave:
+
+Georgios E. Ragkousis (2019). PylseWave: A python package to solve pulse wave dynamics in arterial networks. Zenodo. [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.3426789.svg)](https://doi.org/10.5281/zenodo.3426789)
