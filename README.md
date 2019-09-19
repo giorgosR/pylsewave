@@ -32,13 +32,21 @@ A c/python library to solve 1D pulse wave propagation in blood vessels or any hy
 ### Purpose
 This library is designed to solve efficiently pulse wave dynamics in human arteries. It is written in python, cython and there are some bits of C++.
 
+### Install pylsewave
+
+To install pylsewave toolkit, use pip:
+
+```
+pip install pylsewave
+```
+
 ### Run the example
 
 There are two examples in this directory:
 
 * Adan_77_example.py
 
-To run the case go to the top level directory of the repository and typ:
+To run the case go to the top level directory of the repository and type:
 
 ```bash
 python Adan_77_example.py -ivesseldatafile data\Arterial_Network_ADAN56.txt -ibcinflowfile data\inflow_Aorta.txt -oresfile arterial_network_77_vessels -language py
