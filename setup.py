@@ -28,7 +28,7 @@ ext_cynum = Extension("pylsewave.cynum",
                       )
 
 setup(name="pylsewave",
-      version='1.0.0',
+      version='1.0.1',
       license="GNU GPL v3.0",
       packages=find_packages(),
       description='A python package for pulse wave dynamics and/or any hyperbolic system of PDEs',
