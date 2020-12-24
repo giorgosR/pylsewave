@@ -1,0 +1,12 @@
+# conda env create -f pylsewave.yml
+name: pylsewave
+channels:
+  - defaults
+  - conda-forge
+dependencies:
+  - python=3.5
+  - conda-forge::cython
+  - conda-forge::numpy
+  - pip
+  - pip:
+    - pylsewave
