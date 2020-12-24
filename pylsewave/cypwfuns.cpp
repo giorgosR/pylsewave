@@ -38,7 +38,7 @@ std::vector<double> funs::linspace(double start_in, double end_in, int num_in)
 std::vector<double> funs::gradient(std::vector<double> vinput, double dx) {
 	std::vector<double> vout;
 
-	std::vector<int>::size_type vinput_size = vinput.size();
+	std::size_t vinput_size = vinput.size();
 	if (vinput_size == 1)
 	{
 		vout = vinput;
@@ -87,7 +87,7 @@ int funs::grad(double* inarr, double* out, double dx, size_t N_n){
 }
 
 int funs::tdma(double* a, double* b, double* c,
-	double* d, double* out, size_t N_n) {
+	double* d, double* out, std::size_t N_n) {
 
 	//size_t N_n = d.size();
 //
@@ -97,7 +97,7 @@ int funs::tdma(double* a, double* b, double* c,
 	c_star[0] = c[0] / b[0];
 	d_star[0] = d[0] / b[0];
 
-	for (size_t i = 1; i < N_n - 1; i++)
+	for (std::size_t i = 1; i < N_n - 1; i++)
 	{
 		double m = 1.0 / (b[i] - a[i - 1] * c_star[i - 1]);
 		c_star[i] = c[i] * m;
@@ -109,7 +109,7 @@ int funs::tdma(double* a, double* b, double* c,
 	d_star[N_n - 1] = (d[N_n - 1] - a[N_n - 2] * d_star[N_n - 2]) / (b[N_n - 1] - a[N_n - 2] * c_star[N_n - 2]);
 
 	out[N_n - 1] = d_star[N_n - 1];
-	for (int i = N_n - 1; i-- > 0;)
+	for (std::size_t i = N_n - 1; i-- > 0;)
 	{
 //	    std::cout << i << std::endl;
 		out[i] = d_star[i] - c_star[i] * out[i + 1];
@@ -119,12 +119,11 @@ int funs::tdma(double* a, double* b, double* c,
 
 }
 
-double funs::std_dev(double *arr, size_t siz) {
+double funs::std_dev(double *arr, std::size_t siz) {
 	double mean = 0.0;
 	double sum_sq;
 	double *pVal;
 	double diff;
-	double ret;
 
 	pVal = arr;
 	for (size_t i = 0; i < siz; ++i, ++pVal) {
@@ -134,7 +133,7 @@ double funs::std_dev(double *arr, size_t siz) {
 
 	pVal = arr;
 	sum_sq = 0.0;
-	for (size_t i = 0; i < siz; ++i, ++pVal) {
+	for (std::size_t i = 0; i < siz; ++i, ++pVal) {
 		diff = *pVal - mean;
 		sum_sq += diff * diff;
 	}
