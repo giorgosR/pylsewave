@@ -22,6 +22,7 @@ run_cases/
 results/
 .*
 !.gitignore
+!.conda
 
 test/*.pyc
 
