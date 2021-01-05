@@ -35,12 +35,12 @@ class build_ext_compiler_check(build_ext):
         if 'msvc' in compiler:
             for extension in self.extensions:
                 if extension == ext_cynum:
-                    extension.extra_compile_args = ['/O2', '/openmp', '/EHsc', '/GA', '/favor:INTEL64']
-                    # extension.extra_compile_args.append('/O2')
-                    # extension.extra_compile_args.append('/openmp')
-                    # extension.extra_compile_args.append('/EHsc')
-                    # extension.extra_compile_args.append('/GA')
-                    # extension.extra_compile_args.append('/favor:INTEL64')
+#                    extension.extra_compile_args = ['/Ot', '/openmp', '/EHsc', '/GA', '/favor:INTEL64']
+                    extension.extra_compile_args.append('/O2')
+                    extension.extra_compile_args.append('/openmp')
+                    extension.extra_compile_args.append('/EHsc')
+                    extension.extra_compile_args.append('/GA')
+                    extension.extra_compile_args.append('/favor:INTEL64')
 
                     # extension.extra_compile_args.append( '-O2' )
                     # extension.extra_compile_args.append( '-std=c++11' )
