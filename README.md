@@ -1,3 +1,5 @@
+[![Anaconda-Server Badge](https://anaconda.org/giorgosr/pylsewave/badges/version.svg)](https://anaconda.org/giorgosr/pylsewave)
+
 # pylsewave
 
 ![pylsewavelogo](./doc/sphinx-rootdir/figures/pylsewave_logo64x64.png)
@@ -30,14 +32,15 @@ A c/python library to solve 1D pulse wave propagation in blood vessels or any hy
 ![Hyperbolic system](https://latex.codecogs.com/gif.latex?%5Cfrac%7B%5Cpartial%20%5Cbf%7BU%7D%7D%7B%5Cpartial%20t%7D%20&plus;%20%5Cfrac%7B%5Cpartial%20%5Cbf%7BF%7D%7D%7B%5Cpartial%20x%7D%20%3D%20%5Cbf%7BS%7D)
 
 ### Purpose
+
 This library is designed to solve efficiently pulse wave dynamics in human arteries. It is written in python, cython and there are some bits of C++.
 
 ### Install pylsewave
 
-To install pylsewave toolkit, use pip:
+To install pylsewave toolkit type:
 
-```
-pip install pylsewave
+```bash
+conda install -c giorgosR pylsewave
 ```
 
 ### Run the example
