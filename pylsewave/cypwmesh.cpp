@@ -7,7 +7,7 @@
 
 const double pi = 3.14159265358979323846;
 
-double round(double number)
+double pwround(double number)
 {
 	return number < 0.0 ? ceil(number - 0.5) : floor(number + 0.5);
 }
@@ -119,14 +119,14 @@ std::vector<double> Vessel::getR0() {
 void Vessel::setdx(double dx_input)
 {
 	//dx = dx_input;
-	if ((int)(round(L / dx_input) + 1) == 1)
+	if (static_cast<int>(pwround(L / dx_input) + 1) == 1)
 	{
 		x.push_back(0.);
 		x.push_back(L);
 	}
 	else
 	{
-		x = funs::linspace(0., L, (int)round(L / dx_input) + 1);
+		x = funs::linspace(0., L, static_cast<int>(pwround(L / dx_input) + 1));
 	}
 	dx = x[1] - x[0];
 	// calculate R0(x)
@@ -217,7 +217,7 @@ VesselScaled::VesselScaled(std::string const & name_, double L_, double R_proxim
 
 void VesselScaled::set_k_vector(std::vector<double> k_input, double rho=0, double qc=0, double rc=0) {
 	k = k_input;
-	if (rho != 0 && qc != 0 & rc != 0)
+	if (rho != 0 && qc != 0 && rc != 0)
 	{
 		double kc;
 		kc = (rho*pow(qc, 2) / pow(rc, 4));

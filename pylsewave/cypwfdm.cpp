@@ -50,8 +50,8 @@ double Circle::sum_mat(std::vector< std::vector<double> > & sv)
 
 	double tot = 0;
 
-	int svrows = sv.size();
-	int svcols = sv[0].size();
+	std::size_t svrows = sv.size();
+	std::size_t svcols = sv[0].size();
 	std::cout << "vector length " << svrows << " , " << svcols << std::endl;
 
 	for (int ii = 0; ii<svrows; ii++)
@@ -83,8 +83,8 @@ void numfuncs::ccmultiply4d(double* array, double multiplier, int m, int n, int 
 }
 
 std::vector<std::vector<double>> numfuncs::advance_solution(std::vector<std::vector<double>> const& u_n, int n) {
-	int svrows = u_n.size();
-	int svcols = u_n[0].size();
+	std::size_t svrows = u_n.size();
+	std::size_t svcols = u_n[0].size();
 
 	std::vector< std::vector<double> > tot;
 	tot.resize(svrows, std::vector<double>(svcols, -1));

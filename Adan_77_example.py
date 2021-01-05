@@ -184,10 +184,10 @@ def run_Adan_77_case(idatafile, ibcsinflowfile, oresfile, language,
         myPDEs = cPDEsWat(vesssel_network, rho=CONSTANT_RHO_BLOOD, mu=CONSTANT_MU_BLOOD)
         myBCs = BCsADAN56(myPDEs, q_inlet_bc.eval_spline)
     
-        U0_vessel = np.array([0],dtype=np.int)
-        UL_vessel = np.array(list(terminal_vessels.keys()))
-        UBif_vessel = np.array(bif_vessels)
-        UConj_vessel = np.array(conj_points)
+        U0_vessel = np.array([0],dtype=np.int64)
+        UL_vessel = np.array(list(terminal_vessels.keys()),dtype=np.int64)
+        UBif_vessel = np.array(bif_vessels,dtype=np.int64)
+        UConj_vessel = np.array(conj_points,dtype=np.int64)
     
         mySolver = cMacCormackSolver(myBCs)
         mySolver.set_T(dt=dt, T=T, no_cycles=tc)
