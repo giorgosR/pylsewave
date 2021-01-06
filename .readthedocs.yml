@@ -9,5 +9,5 @@ version: 2
 sphinx:
   configuration: doc/conf.py
 
-conda:
-    environment: .conda/readthedocs.yml
+# conda:
+#     environment: .conda/readthedocs.yml
