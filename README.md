@@ -1,4 +1,5 @@
 [![Anaconda-Server Badge](https://anaconda.org/giorgosr/pylsewave/badges/version.svg)](https://anaconda.org/giorgosr/pylsewave)
+[![Anaconda-Server Badge](https://anaconda.org/giorgosr/pylsewave/badges/platforms.svg)](https://anaconda.org/giorgosr/pylsewave)
 
 # pylsewave
 
