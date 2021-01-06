@@ -18,7 +18,7 @@ jobs:
     - bash: echo "##vso[task.prependpath]$CONDA/bin"
       displayName: Add conda to PATH
 
-    - bash: conda create --quiet -n pylsewave -c conda-forge python='$(python.version)'
+    - bash: conda create --quiet --yes -n pylsewave -c conda-forge python='$(python.version)'
       displayName: Create Anaconda environment
 
     - script: |
