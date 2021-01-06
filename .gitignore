@@ -3,7 +3,7 @@
 .idea/
 build/
 dist/
-pylseWave.egg-info/
+pylsewave.egg-info/
 *.pyc
 *.avi
 *.vtp
@@ -12,6 +12,7 @@ pylseWave.egg-info/
 pylsewave/*.pyc
 pylsewave/*.html
 pylsewave/*.pyd
+pylsewave/*.so
 pylsewave/cynum.cpp
 pylsewave/pylsewave/*
 pylsewave/cyfdm.c
