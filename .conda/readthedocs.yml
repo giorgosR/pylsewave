@@ -1,0 +1,3 @@
+name: pylsewave-readthedocs
+channels:
+  - conda-forge
