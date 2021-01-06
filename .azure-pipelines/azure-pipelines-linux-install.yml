@@ -1,0 +1,31 @@
+jobs:
+
+  - job: Ubuntu_16_04_install
+    pool:
+      vmImage: 'Ubuntu 16.04'
+    strategy:
+      matrix:    
+        Python36:
+          python.version: '3.6'
+        Python37:
+          python.version: '3.7'
+        Python38:
+          python.version: '3.8'
+      maxParallel: 3
+
+    steps:
+
+    - bash: echo "##vso[task.prependpath]$CONDA/bin"
+      displayName: Add conda to PATH
+
+    - bash: conda create --quiet -n pylsewave -c conda-forge python='$(python.version)'
+      displayName: Create Anaconda environment
+
+    - script: |
+        source activate pylsewave
+        conda install --yes -c giorgosr pylsewave
+        python -c "import pylsewave"
+        python -c "import pylsewave.mesh"
+        python -c "import pylsewave.fdm"
+        python -c "import pylsewave.cynum"
+      displayName: install check        

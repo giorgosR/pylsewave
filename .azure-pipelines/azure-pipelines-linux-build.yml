@@ -1,0 +1,27 @@
+jobs:
+
+  - job: Ubuntu_16_04_build
+    pool:
+      vmImage: 'Ubuntu 16.04'
+    strategy:
+      matrix:    
+        Python36:
+          python.version: '3.6'
+        Python37:
+          python.version: '3.7'
+        Python38:
+          python.version: '3.8'
+      maxParallel: 3
+
+    steps:
+
+    - bash: echo "##vso[task.prependpath]$CONDA/bin"
+      displayName: Add conda to PATH
+
+    - bash: conda create --quiet -n pylsewave -c conda-forge python='$(python.version)' cython numpy scipy cymem matplotlib
+      displayName: Create Anaconda environment
+
+    - script: |
+        source activate pylsewave
+        python setup.py build_ext --inplace
+      displayName: build

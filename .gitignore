@@ -25,6 +25,7 @@ results/
 !.gitignore
 !.readthedocs.yml
 !.conda
+!.azure-pipelines
 
 test/*.pyc
 

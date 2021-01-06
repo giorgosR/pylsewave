@@ -1,0 +1,33 @@
+jobs:
+
+  - job: Windows_VS2019_install
+    pool:
+      vmImage: 'windows-2019'
+    strategy:
+      matrix:    
+        Python36:
+          python.version: '3.6'
+        Python37:
+          python.version: '3.7'
+        Python38:
+          python.version: '3.8'
+      maxParallel: 3
+    timeoutInMinutes: 360
+  
+    steps:
+
+    - powershell: |
+        Write-Host "##vso[task.prependpath]$env:CONDA\Scripts"
+      displayName: Add conda to PATH
+
+    - script: conda create --quiet -n pylsewave -c conda-forge python='$(python.version)'
+      displayName: Create Anaconda environment
+
+    - script: |
+        call activate pylsewave
+        conda install --yes -c giorgosr pylsewave
+        python -c "import pylsewave"
+        python -c "import pylsewave.mesh"
+        python -c "import pylsewave.fdm"
+        python -c "import pylsewave.cynum"
+      displayName: install check
