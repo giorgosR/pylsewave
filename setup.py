@@ -22,29 +22,31 @@ ext_cynum = Extension("pylsewave.cynum",
                                "pylsewave/cypwmesh.cpp",
                                "pylsewave/cypwfuns.cpp"],
                       language='c++',
-#                      extra_compile_args=['/Ot', '/openmp', '/EHsc', '/GA', '/favor:INTEL64'],
-                      # extra_link_args=['-openmp'],
-                      # include_path = ["./pylsewave/include/",],
-                      include_dirs=["pylsewave/include/", numpy.get_include()]
-                      )
+                      include_dirs=["pylsewave/include/", numpy.get_include()])
 
 class build_ext_compiler_check(build_ext):
     def build_extensions(self):
         compiler = self.compiler.compiler_type
         print('\n\ncompiler', compiler)
         if 'msvc' in compiler:
+            print("compiling on Windows")
             for extension in self.extensions:
-                if extension == ext_cynum:
-#                    extension.extra_compile_args = ['/Ot', '/openmp', '/EHsc', '/GA', '/favor:INTEL64']
+                if extension.name == "pylsewave.cynum":
                     extension.extra_compile_args.append('/O2')
                     extension.extra_compile_args.append('/openmp')
                     extension.extra_compile_args.append('/EHsc')
                     extension.extra_compile_args.append('/GA')
                     extension.extra_compile_args.append('/favor:INTEL64')
 
-                    # extension.extra_compile_args.append( '-O2' )
-                    # extension.extra_compile_args.append( '-std=c++11' )
-                    # e.extra_link_args = ['-lgomp']
+        if 'unix' in compiler:
+            print("compiling on unix")
+            for extension in self.extensions:
+                if extension.name == "pylsewave.cynum":
+                    extension.extra_compile_args.append('-O2')
+                    extension.extra_compile_args.append('-fopenmp')
+                    extension.extra_compile_args.append('-std=c++11')
+                    extension.extra_link_args = ['-lgomp']
+
         super().build_extensions()
 
 
@@ -72,12 +74,11 @@ setup(name="pylsewave",
         'Programming Language :: Python :: 3.7',
         'Programming Language :: Python :: 3.8',
         'Programming Language :: Python :: 3.9',
-        'Environment :: Win32 (MS Windows)',
         'Operating System :: OS Independent'],
       keywords='pdes fdm pulsewave blood-vessels',
       long_description=read('README.md'),
 	  long_description_content_type='text/markdown',
       requires=['numpy', "scipy", 'matplotlib'],
       install_requires=['numpy', 'scipy', 'matplotlib'],
-      ext_modules=cythonize([ext_cynum], annotate=True),
-      cmdclass={ 'build_ext': build_ext_compiler_check })
+      cmdclass={ 'build_ext': build_ext_compiler_check },
+      ext_modules=cythonize([ext_cynum], annotate=True))
