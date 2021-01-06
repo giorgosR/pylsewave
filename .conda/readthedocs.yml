@@ -1,3 +1,7 @@
 name: pylsewave-readthedocs
 channels:
   - conda-forge
+  - giorgosr
+dependencies:
+  - conda-forge::python=3.8
+  - giorgosr::pylsewave
