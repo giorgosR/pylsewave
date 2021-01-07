@@ -1,8 +1,8 @@
 jobs:
 
-  - job: Ubuntu_16_04_build
+  - job: Ubuntu_18_04_build
     pool:
-      vmImage: 'Ubuntu 16.04'
+      vmImage: 'Ubuntu 18.04'
     strategy:
       matrix:    
         Python36:
