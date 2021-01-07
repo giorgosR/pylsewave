@@ -7,6 +7,7 @@
 [![Documentation Status](https://readthedocs.org/projects/pylsewave/badge/?version=latest)](https://pylsewave.readthedocs.io/en/latest/?badge=latest)
 [![Anaconda-Server Badge](https://anaconda.org/giorgosr/pylsewave/badges/version.svg)](https://anaconda.org/giorgosr/pylsewave)
 [![Anaconda-Server Badge](https://anaconda.org/giorgosr/pylsewave/badges/platforms.svg)](https://anaconda.org/giorgosr/pylsewave)
+[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/giorgosR/pylsewave/master?filepath=JupyterNbs%2FIn_Silico_Upper_Arm_Network.ipynb)
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.3426789.svg)](https://doi.org/10.5281/zenodo.3426789)
 
 

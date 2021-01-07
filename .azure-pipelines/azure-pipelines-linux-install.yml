@@ -15,6 +15,12 @@ jobs:
 
     steps:
 
+    # install dependencies
+    - script: |
+        sudo apt -y update
+        sudo apt-get install build-essential -y
+      displayName: 'install compilers'
+
     - bash: echo "##vso[task.prependpath]$CONDA/bin"
       displayName: Add conda to PATH
 
