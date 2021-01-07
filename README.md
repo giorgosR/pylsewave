@@ -1,11 +1,14 @@
-[![Build Status](https://dev.azure.com/giorgosragos/giorgosr-pylsewave/_apis/build/status/giorgosR.pylsewave?branchName=master)](https://dev.azure.com/giorgosragos/giorgosr-pylsewave/_build/latest?definitionId=4&branchName=master)
-[![Documentation Status](https://readthedocs.org/projects/pylsewave/badge/?version=latest)](https://pylsewave.readthedocs.io/en/latest/?badge=latest)
-[![Anaconda-Server Badge](https://anaconda.org/giorgosr/pylsewave/badges/version.svg)](https://anaconda.org/giorgosr/pylsewave)
-[![Anaconda-Server Badge](https://anaconda.org/giorgosr/pylsewave/badges/platforms.svg)](https://anaconda.org/giorgosr/pylsewave)
-
 # pylsewave
 
 ![pylsewavelogo](./doc/sphinx-rootdir/figures/pylsewave_logo64x64.png)
+
+[![Build Status](https://dev.azure.com/giorgosragos/giorgosr-pylsewave/_apis/build/status/giorgosR.pylsewave?branchName=master)](https://dev.azure.com/giorgosragos/giorgosr-pylsewave/_build/latest?definitionId=4&branchName=master)
+![Docker Cloud Build Status](https://img.shields.io/docker/cloud/build/giorgosr/pylsewave)
+[![Documentation Status](https://readthedocs.org/projects/pylsewave/badge/?version=latest)](https://pylsewave.readthedocs.io/en/latest/?badge=latest)
+[![Anaconda-Server Badge](https://anaconda.org/giorgosr/pylsewave/badges/version.svg)](https://anaconda.org/giorgosr/pylsewave)
+[![Anaconda-Server Badge](https://anaconda.org/giorgosr/pylsewave/badges/platforms.svg)](https://anaconda.org/giorgosr/pylsewave)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.3426789.svg)](https://doi.org/10.5281/zenodo.3426789)
+
 
 # Repository structure
 
