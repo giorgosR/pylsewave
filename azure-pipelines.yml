@@ -2,18 +2,18 @@ trigger:
 - master
 - development
 
-stages:
+# stages:
 
-- stage: build
-  displayName: build-windows-linux
+# - stage: build
+#   displayName: build-windows-linux
 
-  jobs:
-    - template: ./.azure-pipelines/azure-pipelines-windows-build.yml
-    - template: ./.azure-pipelines/azure-pipelines-linux-build.yml
+jobs:
+  - template: ./.azure-pipelines/azure-pipelines-windows-build.yml
+  - template: ./.azure-pipelines/azure-pipelines-linux-build.yml
 
-- stage: install
-  displayName: install-windows-linux
+# - stage: install
+#   displayName: install-windows-linux
 
-  jobs:
-    - template: ./.azure-pipelines/azure-pipelines-windows-install.yml
-    - template: ./.azure-pipelines/azure-pipelines-linux-install.yml
+# jobs:
+  - template: ./.azure-pipelines/azure-pipelines-windows-install.yml
+  - template: ./.azure-pipelines/azure-pipelines-linux-install.yml
