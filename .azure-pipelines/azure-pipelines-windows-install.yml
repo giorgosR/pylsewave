@@ -4,14 +4,16 @@ jobs:
     pool:
       vmImage: 'windows-2019'
     strategy:
-      matrix:    
+      matrix:
+        Python35:
+          python.version: 3.5 
         Python36:
           python.version: 3.6
         Python37:
           python.version: 3.7
         Python38:
           python.version: 3.8
-      maxParallel: 3
+      maxParallel: 4
     timeoutInMinutes: 360
   
     steps:

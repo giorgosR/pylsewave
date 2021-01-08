@@ -2,16 +2,18 @@ jobs:
 
   - job: Ubuntu_18_04_build
     pool:
-      vmImage: 'Ubuntu 18.04'
+      vmImage: 'ubuntu-18.04'
     strategy:
-      matrix:    
+      matrix:
+        Python35:
+          python.version: '3.5'    
         Python36:
           python.version: '3.6'
         Python37:
           python.version: '3.7'
         Python38:
           python.version: '3.8'
-      maxParallel: 3
+      maxParallel: 4
 
     steps:
 
